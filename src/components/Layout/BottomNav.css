@@ -1,0 +1,99 @@
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: var(--nav-height);
+  padding-bottom: var(--safe-bottom);
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  border-top: 1px solid var(--nav-border);
+  z-index: var(--z-nav);
+  transition: transform var(--transition-base);
+}
+
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: var(--space-2) var(--space-3);
+  color: var(--text-tertiary);
+  transition: color var(--transition-fast);
+  position: relative;
+  -webkit-tap-highlight-color: transparent;
+  min-width: 56px;
+}
+
+.nav-item.active {
+  color: var(--primary-500);
+}
+
+.nav-icon-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 28px;
+}
+
+.nav-indicator {
+  position: absolute;
+  inset: 0;
+  background: var(--primary-50);
+  border-radius: var(--radius-full);
+  animation: scaleIn var(--transition-fast) ease-out;
+}
+
+[data-theme="dark"] .nav-indicator {
+  background: rgba(108, 92, 231, 0.15);
+}
+
+.nav-label {
+  font-size: var(--font-xs);
+  font-weight: var(--weight-medium);
+  line-height: 1;
+}
+
+.nav-main {
+  padding: 0;
+}
+
+.nav-main-btn {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary-500), var(--primary-700));
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 16px rgba(108, 92, 231, 0.4);
+  transform: translateY(-8px);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.nav-main-btn:active {
+  transform: translateY(-6px) scale(0.95);
+}
+
+.nav-item.active .nav-icon-wrapper svg {
+  position: relative;
+  z-index: 1;
+}
+
+@media (hover: hover) {
+  .nav-item:hover:not(.nav-main) {
+    color: var(--primary-400);
+  }
+  .nav-main-btn:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 6px 24px rgba(108, 92, 231, 0.5);
+  }
+}

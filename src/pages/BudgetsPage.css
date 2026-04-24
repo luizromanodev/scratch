@@ -1,0 +1,214 @@
+.budgets-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-4) 0;
+  margin-bottom: var(--space-4);
+}
+
+.back-btn {
+  background: var(--bg-tertiary);
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.back-btn:hover {
+  background: var(--bg-hover);
+}
+
+.budgets-title {
+  font-size: var(--font-2xl);
+  font-weight: var(--weight-bold);
+  margin-bottom: var(--space-1);
+}
+
+.budgets-subtitle {
+  font-size: var(--font-base);
+  color: var(--text-secondary);
+}
+
+.budgets-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: var(--space-5);
+}
+
+.add-budget-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  background: var(--primary-500);
+  color: white;
+  border: none;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-full);
+  font-size: var(--font-sm);
+  font-weight: var(--weight-medium);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.add-budget-btn:hover {
+  background: var(--primary-600);
+  transform: translateY(-1px);
+}
+
+.budgets-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.budget-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  transition: transform var(--transition-fast);
+}
+
+.budget-card:hover {
+  transform: translateY(-2px);
+}
+
+.budget-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--space-3);
+}
+
+.budget-cat-info {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.budget-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-lg);
+  color: white;
+}
+
+.budget-cat-name {
+  font-weight: var(--weight-semibold);
+  font-size: var(--font-base);
+}
+
+.budget-amounts {
+  text-align: right;
+}
+
+.budget-spent {
+  display: block;
+  font-size: var(--font-lg);
+  font-weight: var(--weight-bold);
+}
+
+.budget-limit {
+  font-size: var(--font-xs);
+  color: var(--text-secondary);
+}
+
+.budget-progress-container {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+
+.budget-progress-bar {
+  flex: 1;
+  height: 8px;
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.budget-progress-fill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  transition: width 0.5s ease-out, background-color 0.3s ease;
+}
+
+.budget-percentage {
+  font-size: var(--font-xs);
+  font-weight: var(--weight-bold);
+  min-width: 3ch;
+  text-align: right;
+}
+
+.budget-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--border-color);
+}
+
+.budget-message {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--font-xs);
+  font-weight: var(--weight-medium);
+}
+
+.budget-message.good { color: var(--success-500); }
+.budget-message.warning { color: var(--warning-500); }
+.budget-message.danger { color: var(--danger-500); }
+
+.budget-delete-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: var(--space-1);
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+}
+
+.budget-delete-btn:hover {
+  background: var(--danger-50);
+  color: var(--danger-500);
+}
+
+[data-theme="dark"] .budget-delete-btn:hover {
+  background: rgba(255, 107, 107, 0.15);
+}
+
+.budget-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.help-text {
+  display: block;
+  font-size: var(--font-xs);
+  margin-top: var(--space-1);
+}
+
+.help-text.warning {
+  color: var(--warning-500);
+}
+
+.mt-2 {
+  margin-top: var(--space-2);
+}
