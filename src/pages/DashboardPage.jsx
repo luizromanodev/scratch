@@ -9,9 +9,11 @@ import { Doughnut } from 'react-chartjs-2'
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js'
 import {
   TrendingUp, TrendingDown, Eye, EyeOff, ChevronLeft, ChevronRight,
-  Plus, Minus, ArrowRight, PieChart, Target
+  Plus, Minus, ArrowRight, PieChart, Target, BarChart3, Search, Settings
 } from 'lucide-react'
 import './DashboardPage.css'
+import Onboarding from '../components/UI/Onboarding'
+import GlobalSearch from '../components/UI/GlobalSearch'
 
 ChartJS.register(ArcElement, Tooltip, Legend)
 
@@ -23,6 +25,27 @@ export default function DashboardPage() {
   const [showBalance, setShowBalance] = useState(true)
   const [month, setMonth] = useState(getCurrentMonth())
   const [year, setYear] = useState(getCurrentYear())
+  const [showOnboarding, setShowOnboarding] = useState(
+    () => !localStorage.getItem('finflow_onboarding_done')
+  )
+  const [showSearch, setShowSearch] = useState(false)
+  const [showWidgetSettings, setShowWidgetSettings] = useState(false)
+
+  // Widget visibility preferences
+  const [widgets, setWidgets] = useState(() => {
+    try {
+      const saved = localStorage.getItem('finflow_widgets')
+      return saved ? JSON.parse(saved) : { planning: true, chart: true, transactions: true }
+    } catch { return { planning: true, chart: true, transactions: true } }
+  })
+
+  const toggleWidget = (key) => {
+    setWidgets(prev => {
+      const updated = { ...prev, [key]: !prev[key] }
+      localStorage.setItem('finflow_widgets', JSON.stringify(updated))
+      return updated
+    })
+  }
 
   const balance = useMemo(() => getBalance(month, year), [month, year, getBalance])
   const transactions = useMemo(() => getTransactionsByMonth(month, year).slice(0, 5), [month, year, getTransactionsByMonth])
@@ -78,21 +101,32 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="page container">
+    <>
+      {showOnboarding && <Onboarding onComplete={() => setShowOnboarding(false)} />}
+      <GlobalSearch isOpen={showSearch} onClose={() => setShowSearch(false)} />
+      <div className="page container">
       {/* Header */}
       <header className="dash-header">
         <div className="dash-greeting">
           <p className="dash-hello">{getGreeting()},</p>
           <h1 className="dash-name">{firstName} 👋</h1>
         </div>
-        <div className="dash-month-selector">
-          <button onClick={prevMonth} className="dash-month-btn" aria-label="Mês anterior">
-            <ChevronLeft size={18} />
+        <div className="dash-header-actions">
+          <button className="dash-search-btn" onClick={() => setShowSearch(true)} aria-label="Buscar">
+            <Search size={20} />
           </button>
-          <span className="dash-month-label">{getMonthName(month)} {year}</span>
-          <button onClick={nextMonth} className="dash-month-btn" aria-label="Próximo mês">
-            <ChevronRight size={18} />
+          <button className="dash-search-btn" onClick={() => setShowWidgetSettings(s => !s)} aria-label="Widgets">
+            <Settings size={18} />
           </button>
+          <div className="dash-month-selector">
+            <button onClick={prevMonth} className="dash-month-btn" aria-label="Mês anterior">
+              <ChevronLeft size={18} />
+            </button>
+            <span className="dash-month-label">{getMonthName(month)} {year}</span>
+            <button onClick={nextMonth} className="dash-month-btn" aria-label="Próximo mês">
+              <ChevronRight size={18} />
+            </button>
+          </div>
         </div>
       </header>
 
@@ -152,8 +186,31 @@ export default function DashboardPage() {
         </button>
       </section>
 
+      {/* Widget Settings Popup */}
+      {showWidgetSettings && (
+        <div className="dash-widget-panel animate-fade-in-up">
+          <h4 className="dash-widget-title">Seções visíveis</h4>
+          {[
+            { key: 'planning', label: 'Planejamento', desc: 'Orçamentos, metas, relatórios' },
+            { key: 'chart', label: 'Gráfico de categorias', desc: 'Distribuição de gastos' },
+            { key: 'transactions', label: 'Últimas transações', desc: 'Transações recentes' },
+          ].map(w => (
+            <button key={w.key} className="dash-widget-item" onClick={() => toggleWidget(w.key)}>
+              <div className="dash-widget-info">
+                <span className="dash-widget-label">{w.label}</span>
+                <span className="dash-widget-desc">{w.desc}</span>
+              </div>
+              <div className={`toggle-switch-mini ${widgets[w.key] ? 'on' : ''}`}>
+                <div className="toggle-thumb-mini" />
+              </div>
+            </button>
+          ))}
+        </div>
+      )}
+
       {/* Planejamento */}
-      <section className="dash-section animate-fade-in-up" style={{ animationDelay: '50ms' }}>
+      {widgets.planning && (
+        <section className="dash-section animate-fade-in-up" style={{ animationDelay: '50ms' }}>
         <h2 className="section-title">Planejamento</h2>
         <div className="planning-grid">
           <button className="planning-card glass" onClick={() => navigate('/budgets')}>
@@ -170,11 +227,19 @@ export default function DashboardPage() {
                <p>Guarde dinheiro</p>
              </div>
           </button>
+          <button className="planning-card glass" onClick={() => navigate('/reports')}>
+             <div className="planning-icon reports-icon"><BarChart3 size={22}/></div>
+             <div className="planning-info">
+               <h3>Relatórios</h3>
+               <p>Insights financeiros</p>
+             </div>
+          </button>
         </div>
       </section>
+      )}
 
       {/* Chart */}
-      {expensesByCategory.length > 0 && (
+      {widgets.chart && expensesByCategory.length > 0 && (
         <section className="dash-section animate-fade-in-up">
           <h2 className="section-title">Gastos por categoria</h2>
           <div className="chart-card">
@@ -201,7 +266,8 @@ export default function DashboardPage() {
       )}
 
       {/* Recent Transactions */}
-      <section className="dash-section animate-fade-in-up" style={{ animationDelay: '100ms' }}>
+      {widgets.transactions && (
+      <section className="dash-section animate-fade-in-up" style={{ animationDelay: '200ms' }}>
         <div className="section-header">
           <h2 className="section-title">Últimas transações</h2>
           {transactions.length > 0 && (
@@ -241,6 +307,8 @@ export default function DashboardPage() {
           </div>
         )}
       </section>
+      )}
     </div>
+    </>
   )
 }

@@ -1,0 +1,163 @@
+/* ═══════════════════════════════
+   Categories Page
+   ═══════════════════════════════ */
+
+.cat-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-4);
+}
+
+.cat-back {
+  width: 40px; height: 40px; border-radius: var(--radius-full);
+  display: flex; align-items: center; justify-content: center;
+  background: var(--bg-tertiary); border: none; cursor: pointer;
+  color: var(--text-primary); transition: all var(--transition-fast);
+}
+.cat-back:hover { background: var(--primary-500); color: white; }
+
+.cat-title {
+  font-size: var(--font-xl);
+  font-weight: var(--weight-bold);
+}
+
+.cat-add-btn {
+  width: 40px; height: 40px; border-radius: var(--radius-full);
+  display: flex; align-items: center; justify-content: center;
+  background: var(--primary-500); border: none; cursor: pointer;
+  color: white; transition: all var(--transition-fast);
+}
+.cat-add-btn:hover { background: var(--primary-600); transform: scale(1.05); }
+
+/* Tabs */
+.cat-tabs {
+  display: flex;
+  gap: var(--space-1);
+  padding: var(--space-1);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--card-border);
+  margin-bottom: var(--space-5);
+}
+
+.cat-tab {
+  flex: 1;
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: var(--font-sm);
+  font-weight: var(--weight-medium);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+.cat-tab.active {
+  background: var(--primary-500);
+  color: white;
+}
+.cat-tab:not(.active):hover {
+  background: var(--bg-tertiary);
+}
+
+/* Category List */
+.cat-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.cat-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-lg);
+  transition: all var(--transition-fast);
+}
+.cat-item:hover {
+  border-color: var(--primary-200);
+}
+
+.cat-item-icon {
+  width: 42px; height: 42px;
+  border-radius: var(--radius-md);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+
+.cat-item-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.cat-item-name {
+  font-size: var(--font-base);
+  font-weight: var(--weight-medium);
+}
+
+.cat-item-type {
+  font-size: var(--font-xs);
+  color: var(--text-tertiary);
+}
+
+.cat-item-actions {
+  display: flex;
+  gap: var(--space-1);
+}
+
+.cat-action-btn {
+  width: 30px; height: 30px;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: transparent;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: all var(--transition-fast);
+}
+
+.cat-item:hover .cat-action-btn { opacity: 1; }
+.cat-action-btn.edit:hover { color: var(--primary-500); background: rgba(108, 92, 231, 0.1); }
+.cat-action-btn.delete:hover { color: var(--danger-500); background: rgba(255, 107, 107, 0.1); }
+
+@media (hover: none) {
+  .cat-action-btn { opacity: 0.6; }
+}
+
+/* Category Form (inside modal) */
+.cat-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.cat-preview {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-lg);
+  justify-content: center;
+}
+
+.cat-preview-icon {
+  width: 48px; height: 48px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cat-preview-name {
+  font-size: var(--font-lg);
+  font-weight: var(--weight-bold);
+}

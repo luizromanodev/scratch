@@ -12,17 +12,22 @@ import './AddTransactionPage.css'
 export default function AddTransactionPage() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
-  const { addTransaction, categories, addCategory, creditCards } = useFinance()
+  const { addTransaction, updateTransaction, transactions, categories, addCategory, creditCards } = useFinance()
   const { addToast } = useToast()
 
-  const [type, setType] = useState(searchParams.get('type') || 'expense')
-  const [amount, setAmount] = useState('')
-  const [category, setCategory] = useState('')
-  const [description, setDescription] = useState('')
-  const [date, setDate] = useState(getToday())
-  const [isRecurring, setIsRecurring] = useState(false)
-  const [installments, setInstallments] = useState(1)
-  const [creditCardId, setCreditCardId] = useState('')
+  // Edit mode: ?edit=<id>
+  const editId = searchParams.get('edit')
+  const editTx = editId ? transactions.find(t => t.id === editId) : null
+  const isEdit = !!editTx
+
+  const [type, setType] = useState(editTx?.type || searchParams.get('type') || 'expense')
+  const [amount, setAmount] = useState(editTx ? String(editTx.amount) : '')
+  const [category, setCategory] = useState(editTx?.category || '')
+  const [description, setDescription] = useState(editTx?.description || '')
+  const [date, setDate] = useState(editTx?.date || getToday())
+  const [isRecurring, setIsRecurring] = useState(editTx?.isRecurring || false)
+  const [installments, setInstallments] = useState(editTx?.installments || 1)
+  const [creditCardId, setCreditCardId] = useState(editTx?.creditCardId || '')
 
   // New category modal
   const [showNewCat, setShowNewCat] = useState(false)
@@ -56,23 +61,35 @@ export default function AddTransactionPage() {
       return
     }
 
-    addTransaction({
-      type,
-      amount: numAmount,
-      category,
-      description: description.trim(),
-      date,
-      isRecurring,
-      installments: type === 'expense' ? parseInt(installments) : 1,
-      creditCardId: type === 'expense' ? (creditCardId || null) : null,
-      bankId: null,
-    })
-
-    addToast(
-      type === 'income' ? 'Receita adicionada!' : 'Despesa adicionada!',
-      'success'
-    )
-    navigate('/')
+    if (isEdit) {
+      updateTransaction(editId, {
+        type,
+        amount: numAmount,
+        category,
+        description: description.trim(),
+        date,
+        isRecurring,
+        creditCardId: type === 'expense' ? (creditCardId || null) : null,
+      })
+      addToast('Transação atualizada!', 'success')
+    } else {
+      addTransaction({
+        type,
+        amount: numAmount,
+        category,
+        description: description.trim(),
+        date,
+        isRecurring,
+        installments: type === 'expense' ? parseInt(installments) : 1,
+        creditCardId: type === 'expense' ? (creditCardId || null) : null,
+        bankId: null,
+      })
+      addToast(
+        type === 'income' ? 'Receita adicionada!' : 'Despesa adicionada!',
+        'success'
+      )
+    }
+    navigate(-1)
   }
 
   const handleAddCategory = () => {
@@ -96,7 +113,7 @@ export default function AddTransactionPage() {
         <button className="add-back" onClick={() => navigate(-1)} aria-label="Voltar">
           <ArrowLeft size={22} />
         </button>
-        <h1 className="add-title">Nova transação</h1>
+        <h1 className="add-title">{isEdit ? 'Editar transação' : 'Nova transação'}</h1>
         <div style={{ width: 40 }} />
       </header>
 
@@ -249,7 +266,7 @@ export default function AddTransactionPage() {
         id="btn-submit-transaction"
       >
         <Check size={20} />
-        <span>{type === 'income' ? 'Adicionar Receita' : 'Adicionar Despesa'}</span>
+        <span>{isEdit ? 'Salvar Alterações' : (type === 'income' ? 'Adicionar Receita' : 'Adicionar Despesa')}</span>
       </button>
 
       {/* New Category Modal */}

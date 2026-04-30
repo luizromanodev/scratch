@@ -108,6 +108,155 @@
   border-color: var(--primary-500);
 }
 
+/* Filter button badge */
+.txp-filter-btn {
+  position: relative;
+}
+.txp-filter-btn.active {
+  color: var(--primary-500);
+  background: rgba(108, 92, 231, 0.12);
+}
+.txp-filter-badge {
+  position: absolute;
+  top: 6px; right: 6px;
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--primary-500);
+}
+
+/* Advanced Filters Panel */
+.txp-advanced-filters {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  margin-bottom: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.txp-adv-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.txp-adv-label {
+  font-size: var(--font-xs);
+  font-weight: var(--weight-semibold);
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.txp-adv-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.txp-adv-chip {
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-full);
+  background: var(--bg-tertiary);
+  border: 1px solid transparent;
+  cursor: pointer;
+  font-size: var(--font-xs);
+  font-weight: var(--weight-medium);
+  color: var(--text-secondary);
+  white-space: nowrap;
+  transition: all var(--transition-fast);
+}
+.txp-adv-chip.active {
+  background: var(--primary-500);
+  color: white;
+  border-color: var(--primary-500);
+}
+.txp-adv-chip:not(.active):hover {
+  border-color: var(--primary-200);
+}
+
+/* Date & Value Range */
+.txp-adv-date-range,
+.txp-adv-value-range {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-1);
+}
+.txp-adv-date-sep {
+  font-size: var(--font-xs);
+  color: var(--text-tertiary);
+  flex-shrink: 0;
+}
+.txp-adv-date,
+.txp-adv-value-input {
+  flex: 1;
+  padding: var(--space-2) var(--space-3);
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: var(--font-sm);
+  outline: none;
+  transition: border-color var(--transition-fast);
+}
+.txp-adv-date:focus,
+.txp-adv-value-input:focus {
+  border-color: var(--primary-500);
+}
+
+/* Select */
+.txp-adv-select-wrapper {
+  position: relative;
+}
+.txp-adv-select {
+  width: 100%;
+  padding: var(--space-2) var(--space-7) var(--space-2) var(--space-3);
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: var(--font-sm);
+  outline: none;
+  appearance: none;
+  cursor: pointer;
+  transition: border-color var(--transition-fast);
+}
+.txp-adv-select:focus {
+  border-color: var(--primary-500);
+}
+.txp-adv-select-icon {
+  position: absolute;
+  right: var(--space-3);
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-tertiary);
+  pointer-events: none;
+}
+
+/* Clear Filters */
+.txp-adv-clear {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--danger-50);
+  border: 1px solid transparent;
+  color: var(--danger-500);
+  font-size: var(--font-sm);
+  font-weight: var(--weight-medium);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+.txp-adv-clear:hover {
+  background: var(--danger-500);
+  color: white;
+}
+
 .txp-count {
   font-size: var(--font-sm);
   color: var(--text-tertiary);
@@ -132,27 +281,30 @@
 
 .txp-actions {
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: var(--space-1);
+  align-items: center;
+  gap: var(--space-2);
 }
 
+.txp-edit,
 .txp-delete {
   background: none;
   border: none;
   color: var(--text-tertiary);
   cursor: pointer;
-  padding: 2px;
-  border-radius: 4px;
+  padding: 4px;
+  border-radius: 6px;
   display: flex;
   opacity: 0;
   transition: all var(--transition-fast);
 }
 
+.txp-item:hover .txp-edit,
 .txp-item:hover .txp-delete { opacity: 1; }
+.txp-edit:hover { color: var(--primary-500); background: var(--primary-50); }
 .txp-delete:hover { color: var(--danger-500); background: var(--danger-50); }
 
-/* Mobile: always show delete on touch */
+/* Mobile: always show action buttons */
 @media (hover: none) {
+  .txp-edit,
   .txp-delete { opacity: 0.5; }
 }

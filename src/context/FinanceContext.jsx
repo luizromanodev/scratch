@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, useCallback } from 'react'
+import { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react'
 import { defaultCategories } from '../utils/categories'
 
 const FinanceContext = createContext()
@@ -104,6 +104,13 @@ export function FinanceProvider({ children }) {
     }))
   }, [])
 
+  const updateCategory = useCallback((id, updates) => {
+    setData(prev => ({
+      ...prev,
+      categories: prev.categories.map(c => c.id === id ? { ...c, ...updates } : c)
+    }))
+  }, [])
+
   // Currency
   const setCurrency = useCallback((currency) => {
     setData(prev => ({ ...prev, currency }))
@@ -155,6 +162,84 @@ export function FinanceProvider({ children }) {
   }, [])
   const deleteCreditCard = useCallback((id) => {
     setData(prev => ({ ...prev, creditCards: (prev.creditCards || []).filter(c => c.id !== id) }))
+  }, [])
+
+  // ── Credit Card Invoice Calculation ──
+  const getCardInvoice = useCallback((cardId, month, year) => {
+    const now = new Date()
+    const m = month !== undefined ? month : now.getMonth()
+    const y = year !== undefined ? year : now.getFullYear()
+    return data.transactions
+      .filter(t => {
+        if (t.type !== 'expense' || t.creditCardId !== cardId) return false
+        const d = new Date(t.date + 'T00:00:00')
+        return d.getMonth() === m && d.getFullYear() === y
+      })
+      .reduce((sum, t) => sum + t.amount, 0)
+  }, [data.transactions])
+
+  // Credit cards with live invoice data
+  const creditCardsWithInvoice = useMemo(() => {
+    const now = new Date()
+    return (data.creditCards || []).map(card => ({
+      ...card,
+      currentInvoice: getCardInvoice(card.id, now.getMonth(), now.getFullYear()),
+    }))
+  }, [data.creditCards, getCardInvoice])
+
+  // ── Recurring Transactions ──
+  const processRecurring = useCallback(() => {
+    const today = new Date()
+    const todayStr = today.toISOString().split('T')[0]
+    const recurring = data.transactions.filter(t => t.isRecurring && !t._generatedFrom)
+    let newTxs = []
+
+    recurring.forEach(src => {
+      const srcDate = new Date(src.date + 'T12:00:00')
+      // Generate for each month from the source date until the current month
+      let cursor = new Date(srcDate)
+      cursor.setMonth(cursor.getMonth() + 1)
+
+      while (cursor <= today) {
+        const mStr = String(cursor.getMonth() + 1).padStart(2, '0')
+        const yStr = cursor.getFullYear()
+        const dStr = String(Math.min(cursor.getDate(), new Date(yStr, cursor.getMonth() + 1, 0).getDate())).padStart(2, '0')
+        const dateKey = `${yStr}-${mStr}-${dStr}`
+
+        // Check if this recurring entry already exists for this month
+        const exists = data.transactions.some(t =>
+          t._generatedFrom === src.id &&
+          t.date.startsWith(`${yStr}-${mStr}`)
+        )
+
+        if (!exists) {
+          newTxs.push({
+            ...src,
+            id: crypto.randomUUID(),
+            date: dateKey,
+            createdAt: new Date().toISOString(),
+            _generatedFrom: src.id,
+            isRecurring: false, // The generated copy is not itself recurring
+          })
+        }
+
+        cursor.setMonth(cursor.getMonth() + 1)
+      }
+    })
+
+    if (newTxs.length > 0) {
+      setData(prev => ({
+        ...prev,
+        transactions: [...newTxs, ...prev.transactions]
+      }))
+    }
+    return newTxs.length
+  }, [data.transactions])
+
+  // Process recurring on mount
+  useEffect(() => {
+    processRecurring()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   // Computed values
@@ -215,15 +300,16 @@ export function FinanceProvider({ children }) {
     currency: data.currency || 'BRL',
     budgets: data.budgets || [],
     goals: data.goals || [],
-    creditCards: data.creditCards || [],
+    creditCards: creditCardsWithInvoice,
     addTransaction, updateTransaction, deleteTransaction,
-    addCategory, deleteCategory,
+    addCategory, deleteCategory, updateCategory,
     setCurrency,
     connectBank, disconnectBank,
     addBudget, updateBudget, deleteBudget,
     addGoal, updateGoal, deleteGoal,
     addCreditCard, updateCreditCard, deleteCreditCard,
     getBalance, getTransactionsByMonth, getExpensesByCategory,
+    getCardInvoice, processRecurring,
     clearAllData,
   }
 

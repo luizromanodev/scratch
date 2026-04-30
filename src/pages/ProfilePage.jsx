@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useTheme } from '../context/ThemeContext'
 import { useFinance } from '../context/FinanceContext'
@@ -7,11 +8,12 @@ import { currencies } from '../utils/formatCurrency'
 import Modal from '../components/UI/Modal'
 import {
   User, Moon, Sun, Globe, Trash2, LogOut, ChevronRight,
-  Download, Palette, Info
+  Download, Palette, Info, Tags
 } from 'lucide-react'
 import './ProfilePage.css'
 
 export default function ProfilePage() {
+  const navigate = useNavigate()
   const { user, logout, updateUser } = useAuth()
   const { theme, toggleTheme } = useTheme()
   const { currency, setCurrency, transactions, clearAllData } = useFinance()
@@ -99,6 +101,18 @@ export default function ProfilePage() {
           <div className={`toggle-switch-mini ${theme === 'dark' ? 'on' : ''}`}>
             <div className="toggle-thumb-mini" />
           </div>
+        </button>
+
+        {/* Categories */}
+        <button className="prof-item" onClick={() => navigate('/categories')} id="btn-categories">
+          <div className="prof-item-icon" style={{ background: 'rgba(253, 121, 168, 0.12)', color: '#FD79A8' }}>
+            <Tags size={20} />
+          </div>
+          <div className="prof-item-info">
+            <span className="prof-item-label">Categorias</span>
+            <span className="prof-item-value">Gerenciar categorias</span>
+          </div>
+          <ChevronRight size={18} className="prof-item-arrow" />
         </button>
 
         {/* Currency */}
