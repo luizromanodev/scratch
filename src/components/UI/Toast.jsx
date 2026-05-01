@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useCallback } from 'react'
-import { CheckCircle, AlertCircle, Info, X } from 'lucide-react'
+import { CheckCircle, AlertCircle, AlertTriangle, Info, X } from 'lucide-react'
 import './Toast.css'
 
 const ToastContext = createContext()
@@ -29,6 +29,7 @@ export function ToastProvider({ children }) {
               {toast.type === 'success' && <CheckCircle size={18} />}
               {toast.type === 'error' && <AlertCircle size={18} />}
               {toast.type === 'info' && <Info size={18} />}
+              {toast.type === 'warning' && <AlertTriangle size={18} />}
             </div>
             <span className="toast-message">{toast.message}</span>
             <button className="toast-close" onClick={() => removeToast(toast.id)}>

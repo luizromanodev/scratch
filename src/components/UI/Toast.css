@@ -28,6 +28,7 @@
 .toast-success { border-left: 3px solid var(--success-500); }
 .toast-error { border-left: 3px solid var(--danger-500); }
 .toast-info { border-left: 3px solid var(--primary-500); }
+.toast-warning { border-left: 3px solid var(--warning-500); }
 
 .toast-icon {
   flex-shrink: 0;
@@ -37,6 +38,7 @@
 .toast-success .toast-icon { color: var(--success-500); }
 .toast-error .toast-icon { color: var(--danger-500); }
 .toast-info .toast-icon { color: var(--primary-500); }
+.toast-warning .toast-icon { color: var(--warning-500); }
 
 .toast-message {
   flex: 1;

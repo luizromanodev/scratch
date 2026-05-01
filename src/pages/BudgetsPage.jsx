@@ -3,6 +3,7 @@ import { useFinance } from '../context/FinanceContext'
 import { useToast } from '../components/UI/Toast'
 import { formatCurrency } from '../utils/formatCurrency'
 import { PieChart, Plus, Trash2, AlertTriangle, ArrowLeft } from 'lucide-react'
+import { CategoryIcon } from '../utils/categories'
 import { useNavigate } from 'react-router-dom'
 import Modal from '../components/UI/Modal'
 import './BudgetsPage.css'
@@ -102,7 +103,7 @@ export default function BudgetsPage() {
               <div className="budget-header">
                 <div className="budget-cat-info">
                   <div className="budget-icon" style={{ background: budget.color }}>
-                    {budget.icon}
+                    <CategoryIcon iconName={budget.icon} size={18} color="white" />
                   </div>
                   <span className="budget-cat-name">{budget.categoryName}</span>
                 </div>

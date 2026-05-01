@@ -1,0 +1,68 @@
+/* ═══════════════════════════════
+   Swipeable Row
+   ═══════════════════════════════ */
+
+.swipeable-row {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+}
+
+.swipe-bg {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  border-radius: var(--radius-lg);
+  transition: opacity 0.15s ease;
+}
+
+.swipe-bg-right {
+  justify-content: flex-start;
+  padding-left: var(--space-5);
+}
+
+.swipe-bg-left {
+  justify-content: flex-end;
+  padding-right: var(--space-5);
+}
+
+.swipe-bg-content {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  transition: transform 0.1s ease;
+}
+
+.swipe-label {
+  font-size: var(--font-xs);
+  font-weight: var(--weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: white;
+}
+
+.swipe-bg.triggered {
+  opacity: 1 !important;
+}
+
+.swipe-content {
+  position: relative;
+  z-index: 1;
+  background: var(--card-bg);
+  will-change: transform;
+  touch-action: pan-y;
+}
+
+.swipe-content.transitioning {
+  transition: transform 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* Hint animation on first load */
+@keyframes swipeHint {
+  0%   { transform: translateX(0); }
+  20%  { transform: translateX(-30px); }
+  40%  { transform: translateX(20px); }
+  60%  { transform: translateX(-10px); }
+  100% { transform: translateX(0); }
+}

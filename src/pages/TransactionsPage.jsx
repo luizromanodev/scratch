@@ -8,6 +8,7 @@ import { getCategoryById, CategoryIcon } from '../utils/categories'
 import { parseImportFile } from '../utils/importUtils'
 import { Search, SlidersHorizontal, Trash2, X, FileUp, Pencil, ChevronDown } from 'lucide-react'
 import { useRef } from 'react'
+import SwipeableRow from '../components/UI/SwipeableRow'
 import './TransactionsPage.css'
 
 export default function TransactionsPage() {
@@ -339,26 +340,34 @@ export default function TransactionsPage() {
                 {group.items.map(tx => {
                   const cat = getCategoryById(categories, tx.category)
                   return (
-                    <div key={tx.id} className="transaction-item txp-item">
-                      <div className="tx-icon" style={{ background: cat?.color + '18', color: cat?.color }}>
-                        <CategoryIcon iconName={cat?.icon} size={18} color={cat?.color} />
+                    <SwipeableRow
+                      key={tx.id}
+                      onSwipeRight={() => navigate(`/add?edit=${tx.id}`)}
+                      onSwipeLeft={() => handleDelete(tx.id)}
+                      leftLabel="Editar"
+                      rightLabel="Excluir"
+                    >
+                      <div className="transaction-item txp-item">
+                        <div className="tx-icon" style={{ background: cat?.color + '18', color: cat?.color }}>
+                          <CategoryIcon iconName={cat?.icon} size={18} color={cat?.color} />
+                        </div>
+                        <div className="tx-info">
+                          <span className="tx-desc">{tx.description || cat?.name}</span>
+                          <span className="tx-date">{cat?.name}</span>
+                        </div>
+                        <div className="txp-actions">
+                          <span className={`tx-amount ${tx.type}`}>
+                            {tx.type === 'income' ? '+' : '-'}{formatCurrency(tx.amount, currency)}
+                          </span>
+                          <button className="txp-edit" onClick={() => navigate(`/add?edit=${tx.id}`)} aria-label="Editar">
+                            <Pencil size={14} />
+                          </button>
+                          <button className="txp-delete" onClick={() => handleDelete(tx.id)} aria-label="Deletar">
+                            <Trash2 size={14} />
+                          </button>
+                        </div>
                       </div>
-                      <div className="tx-info">
-                        <span className="tx-desc">{tx.description || cat?.name}</span>
-                        <span className="tx-date">{cat?.name}</span>
-                      </div>
-                      <div className="txp-actions">
-                        <span className={`tx-amount ${tx.type}`}>
-                          {tx.type === 'income' ? '+' : '-'}{formatCurrency(tx.amount, currency)}
-                        </span>
-                        <button className="txp-edit" onClick={() => navigate(`/add?edit=${tx.id}`)} aria-label="Editar">
-                          <Pencil size={14} />
-                        </button>
-                        <button className="txp-delete" onClick={() => handleDelete(tx.id)} aria-label="Deletar">
-                          <Trash2 size={14} />
-                        </button>
-                      </div>
-                    </div>
+                    </SwipeableRow>
                   )
                 })}
               </div>

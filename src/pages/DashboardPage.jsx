@@ -14,6 +14,7 @@ import {
 import './DashboardPage.css'
 import Onboarding from '../components/UI/Onboarding'
 import GlobalSearch from '../components/UI/GlobalSearch'
+import BudgetAlerts from '../components/UI/BudgetAlerts'
 
 ChartJS.register(ArcElement, Tooltip, Legend)
 
@@ -185,6 +186,9 @@ export default function DashboardPage() {
           <span>Despesa</span>
         </button>
       </section>
+
+      {/* Budget Alerts */}
+      <BudgetAlerts />
 
       {/* Widget Settings Popup */}
       {showWidgetSettings && (
