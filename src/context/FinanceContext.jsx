@@ -5,10 +5,25 @@ const FinanceContext = createContext()
 
 const STORAGE_KEY = 'finflow_data'
 
+const DEFAULT_ACCOUNT = {
+  id: 'main',
+  name: 'Carteira Principal',
+  type: 'checking', // checking, savings, cash, investment
+  icon: 'Wallet',
+  color: '#6C5CE7',
+  initialBalance: 0,
+}
+
 function loadData() {
   try {
     const saved = localStorage.getItem(STORAGE_KEY)
-    if (saved) return JSON.parse(saved)
+    if (saved) {
+      const parsed = JSON.parse(saved)
+      // Migration: ensure accounts/tags exist
+      if (!parsed.accounts) parsed.accounts = [DEFAULT_ACCOUNT]
+      if (!parsed.tags) parsed.tags = []
+      return parsed
+    }
   } catch (e) { console.error('Error loading data:', e) }
   return {
     transactions: [],
@@ -18,6 +33,8 @@ function loadData() {
     budgets: [],
     goals: [],
     creditCards: [],
+    accounts: [DEFAULT_ACCOUNT],
+    tags: [],
   }
 }
 
@@ -32,7 +49,7 @@ export function FinanceProvider({ children }) {
 
   useEffect(() => { saveData(data) }, [data])
 
-  // Transactions
+  // ── Transactions ──
   const addTransaction = useCallback((transaction) => {
     let newTxs = [];
     if (transaction.installments && parseInt(transaction.installments) > 1) {
@@ -86,7 +103,7 @@ export function FinanceProvider({ children }) {
     }))
   }, [])
 
-  // Categories
+  // ── Categories ──
   const addCategory = useCallback((category) => {
     const newCat = { ...category, id: 'custom_' + crypto.randomUUID().slice(0, 8) }
     setData(prev => ({
@@ -111,12 +128,12 @@ export function FinanceProvider({ children }) {
     }))
   }, [])
 
-  // Currency
+  // ── Currency ──
   const setCurrency = useCallback((currency) => {
     setData(prev => ({ ...prev, currency }))
   }, [])
 
-  // Banks
+  // ── Banks ──
   const connectBank = useCallback((bank) => {
     setData(prev => ({
       ...prev,
@@ -131,7 +148,7 @@ export function FinanceProvider({ children }) {
     }))
   }, [])
 
-  // Budgets
+  // ── Budgets ──
   const addBudget = useCallback((budget) => {
     setData(prev => ({ ...prev, budgets: [...(prev.budgets || []), { ...budget, id: crypto.randomUUID() }] }))
   }, [])
@@ -142,7 +159,7 @@ export function FinanceProvider({ children }) {
     setData(prev => ({ ...prev, budgets: (prev.budgets || []).filter(b => b.id !== id) }))
   }, [])
 
-  // Goals
+  // ── Goals ──
   const addGoal = useCallback((goal) => {
     setData(prev => ({ ...prev, goals: [...(prev.goals || []), { ...goal, id: crypto.randomUUID(), currentAmount: goal.currentAmount || 0 }] }))
   }, [])
@@ -153,7 +170,7 @@ export function FinanceProvider({ children }) {
     setData(prev => ({ ...prev, goals: (prev.goals || []).filter(g => g.id !== id) }))
   }, [])
 
-  // Credit Cards
+  // ── Credit Cards ──
   const addCreditCard = useCallback((card) => {
     setData(prev => ({ ...prev, creditCards: [...(prev.creditCards || []), { ...card, id: crypto.randomUUID() }] }))
   }, [])
@@ -186,6 +203,104 @@ export function FinanceProvider({ children }) {
       currentInvoice: getCardInvoice(card.id, now.getMonth(), now.getFullYear()),
     }))
   }, [data.creditCards, getCardInvoice])
+
+  // ── Accounts / Wallets ──
+  const addAccount = useCallback((account) => {
+    setData(prev => ({
+      ...prev,
+      accounts: [...(prev.accounts || []), { ...account, id: crypto.randomUUID() }]
+    }))
+  }, [])
+
+  const updateAccount = useCallback((id, updates) => {
+    setData(prev => ({
+      ...prev,
+      accounts: (prev.accounts || []).map(a => a.id === id ? { ...a, ...updates } : a)
+    }))
+  }, [])
+
+  const deleteAccount = useCallback((id) => {
+    if (id === 'main') return // Can't delete default account
+    setData(prev => ({
+      ...prev,
+      accounts: (prev.accounts || []).filter(a => a.id !== id)
+    }))
+  }, [])
+
+  // Transfer between accounts (creates two linked transactions)
+  const transferBetweenAccounts = useCallback((fromAccountId, toAccountId, amount, description, date) => {
+    const transferId = crypto.randomUUID()
+    const newTxs = [
+      {
+        id: crypto.randomUUID(),
+        type: 'expense',
+        amount,
+        category: 'transfer',
+        description: description || 'Transferência entre contas',
+        date: date || new Date().toISOString().split('T')[0],
+        accountId: fromAccountId,
+        transferId,
+        isTransfer: true,
+        createdAt: new Date().toISOString(),
+      },
+      {
+        id: crypto.randomUUID(),
+        type: 'income',
+        amount,
+        category: 'transfer',
+        description: description || 'Transferência entre contas',
+        date: date || new Date().toISOString().split('T')[0],
+        accountId: toAccountId,
+        transferId,
+        isTransfer: true,
+        createdAt: new Date().toISOString(),
+      },
+    ]
+    setData(prev => ({
+      ...prev,
+      transactions: [...newTxs, ...prev.transactions]
+    }))
+    return transferId
+  }, [])
+
+  // Get account balance
+  const getAccountBalance = useCallback((accountId) => {
+    const account = (data.accounts || []).find(a => a.id === accountId)
+    const initial = account?.initialBalance || 0
+    const txs = data.transactions.filter(t => t.accountId === accountId)
+    const income = txs.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0)
+    const expense = txs.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0)
+    return initial + income - expense
+  }, [data.transactions, data.accounts])
+
+  // ── Tags ──
+  const addTag = useCallback((tag) => {
+    const newTag = { ...tag, id: 'tag_' + crypto.randomUUID().slice(0, 8) }
+    setData(prev => ({
+      ...prev,
+      tags: [...(prev.tags || []), newTag]
+    }))
+    return newTag
+  }, [])
+
+  const deleteTag = useCallback((id) => {
+    setData(prev => ({
+      ...prev,
+      tags: (prev.tags || []).filter(t => t.id !== id),
+      // Also remove tag from all transactions
+      transactions: prev.transactions.map(t => ({
+        ...t,
+        tags: (t.tags || []).filter(tid => tid !== id)
+      }))
+    }))
+  }, [])
+
+  const updateTag = useCallback((id, updates) => {
+    setData(prev => ({
+      ...prev,
+      tags: (prev.tags || []).map(t => t.id === id ? { ...t, ...updates } : t)
+    }))
+  }, [])
 
   // ── Recurring Transactions ──
   const processRecurring = useCallback(() => {
@@ -242,14 +357,17 @@ export function FinanceProvider({ children }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  // Computed values
-  const getBalance = useCallback((month, year) => {
+  // ── Computed values ──
+  const getBalance = useCallback((month, year, accountId) => {
     let txs = data.transactions
     if (month !== undefined && year !== undefined) {
       txs = txs.filter(t => {
         const d = new Date(t.date + 'T00:00:00')
         return d.getMonth() === month && d.getFullYear() === year
       })
+    }
+    if (accountId) {
+      txs = txs.filter(t => t.accountId === accountId)
     }
     const income = txs.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0)
     const expense = txs.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0)
@@ -281,6 +399,47 @@ export function FinanceProvider({ children }) {
       .sort((a, b) => b.amount - a.amount)
   }, [data.transactions, data.categories])
 
+  // ── Backup & Restore ──
+  const exportData = useCallback(() => {
+    return {
+      version: '1.0.0',
+      exportedAt: new Date().toISOString(),
+      data: {
+        transactions: data.transactions,
+        categories: data.categories,
+        banks: data.banks,
+        currency: data.currency,
+        budgets: data.budgets,
+        goals: data.goals,
+        creditCards: data.creditCards,
+        accounts: data.accounts,
+        tags: data.tags,
+      }
+    }
+  }, [data])
+
+  const importData = useCallback((jsonData) => {
+    // Validate structure
+    if (!jsonData || !jsonData.data) {
+      throw new Error('Formato de backup inválido')
+    }
+    const d = jsonData.data
+    if (!Array.isArray(d.transactions)) {
+      throw new Error('Backup não contém transações válidas')
+    }
+    setData({
+      transactions: d.transactions || [],
+      categories: d.categories || defaultCategories,
+      banks: d.banks || [],
+      currency: d.currency || 'BRL',
+      budgets: d.budgets || [],
+      goals: d.goals || [],
+      creditCards: d.creditCards || [],
+      accounts: d.accounts || [DEFAULT_ACCOUNT],
+      tags: d.tags || [],
+    })
+  }, [])
+
   const clearAllData = useCallback(() => {
     setData({
       transactions: [],
@@ -290,6 +449,8 @@ export function FinanceProvider({ children }) {
       budgets: [],
       goals: [],
       creditCards: [],
+      accounts: [DEFAULT_ACCOUNT],
+      tags: [],
     })
   }, [])
 
@@ -301,6 +462,8 @@ export function FinanceProvider({ children }) {
     budgets: data.budgets || [],
     goals: data.goals || [],
     creditCards: creditCardsWithInvoice,
+    accounts: data.accounts || [DEFAULT_ACCOUNT],
+    tags: data.tags || [],
     addTransaction, updateTransaction, deleteTransaction,
     addCategory, deleteCategory, updateCategory,
     setCurrency,
@@ -308,8 +471,12 @@ export function FinanceProvider({ children }) {
     addBudget, updateBudget, deleteBudget,
     addGoal, updateGoal, deleteGoal,
     addCreditCard, updateCreditCard, deleteCreditCard,
+    addAccount, updateAccount, deleteAccount,
+    transferBetweenAccounts, getAccountBalance,
+    addTag, deleteTag, updateTag,
     getBalance, getTransactionsByMonth, getExpensesByCategory,
     getCardInvoice, processRecurring,
+    exportData, importData,
     clearAllData,
   }
 

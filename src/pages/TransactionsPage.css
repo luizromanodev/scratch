@@ -308,3 +308,21 @@
   .txp-edit,
   .txp-delete { opacity: 0.5; }
 }
+
+/* Tag Badges */
+.tx-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 2px;
+}
+
+.tx-tag-badge {
+  display: inline-block;
+  padding: 1px 6px;
+  border-radius: var(--radius-full);
+  font-size: 10px;
+  font-weight: var(--weight-semibold);
+  letter-spacing: 0.3px;
+}
+

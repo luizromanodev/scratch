@@ -1,0 +1,227 @@
+/* ═══════════════════════════════
+   Accounts Page
+   ═══════════════════════════════ */
+
+.acc-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-6);
+  padding-top: var(--space-2);
+}
+
+.acc-back,
+.acc-transfer-btn {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.acc-back:hover,
+.acc-transfer-btn:hover {
+  background: var(--primary-500);
+  color: white;
+  border-color: var(--primary-500);
+}
+
+.acc-title {
+  font-size: var(--font-2xl);
+  font-weight: var(--weight-bold);
+}
+
+/* Total Card */
+.acc-total-card {
+  background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-700) 100%);
+  border-radius: var(--radius-xl);
+  padding: var(--space-6);
+  margin-bottom: var(--space-6);
+  text-align: center;
+  color: white;
+}
+
+.acc-total-label {
+  display: block;
+  font-size: var(--font-sm);
+  opacity: 0.8;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: var(--space-2);
+}
+
+.acc-total-value {
+  display: block;
+  font-size: var(--font-3xl);
+  font-weight: var(--weight-bold);
+}
+
+/* Account Cards */
+.acc-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-bottom: var(--space-6);
+}
+
+.acc-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-lg);
+  transition: all var(--transition-fast);
+  border-left: 3px solid var(--acc-color, var(--primary-500));
+}
+
+.acc-card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.acc-card-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.acc-card-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.acc-card-name {
+  display: block;
+  font-weight: var(--weight-semibold);
+  font-size: var(--font-base);
+  color: var(--text-primary);
+}
+
+.acc-card-type {
+  display: block;
+  font-size: var(--font-xs);
+  color: var(--text-tertiary);
+}
+
+.acc-card-right {
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.acc-card-balance {
+  display: block;
+  font-weight: var(--weight-bold);
+  font-size: var(--font-base);
+  margin-bottom: var(--space-1);
+}
+
+.acc-card-balance.positive { color: var(--success-500); }
+.acc-card-balance.negative { color: var(--danger-500); }
+
+.acc-card-actions {
+  display: flex;
+  gap: var(--space-1);
+  justify-content: flex-end;
+}
+
+.acc-action-btn {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-tertiary);
+  border: none;
+  border-radius: var(--radius-sm);
+  color: var(--text-tertiary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.acc-action-btn:hover {
+  background: var(--primary-500);
+  color: white;
+}
+
+.acc-action-btn.danger:hover {
+  background: var(--danger-500);
+  color: white;
+}
+
+/* Add Button */
+.acc-add-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  background: var(--bg-tertiary);
+  border: 2px dashed var(--border-color);
+  border-radius: var(--radius-lg);
+  color: var(--text-secondary);
+  font-weight: var(--weight-semibold);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.acc-add-btn:hover {
+  border-color: var(--primary-500);
+  color: var(--primary-500);
+  background: var(--primary-50);
+}
+
+[data-theme="dark"] .acc-add-btn:hover {
+  background: rgba(108, 92, 231, 0.1);
+}
+
+/* Form */
+.acc-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.acc-type-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2);
+}
+
+.acc-type-chip {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  background: var(--bg-tertiary);
+  border: 1.5px solid var(--border-color);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  font-size: var(--font-sm);
+  color: var(--text-secondary);
+}
+
+.acc-type-chip.active {
+  font-weight: var(--weight-semibold);
+}
+
+/* Transfer Arrow */
+.acc-transfer-arrow {
+  display: flex;
+  justify-content: center;
+  padding: var(--space-2) 0;
+  color: var(--text-tertiary);
+  transform: rotate(90deg);
+}

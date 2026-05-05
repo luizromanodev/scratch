@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useTheme } from '../context/ThemeContext'
@@ -8,7 +8,7 @@ import { currencies } from '../utils/formatCurrency'
 import Modal from '../components/UI/Modal'
 import {
   User, Moon, Sun, Globe, Trash2, LogOut, ChevronRight,
-  Download, Palette, Info, Tags
+  Download, Upload, Palette, Info, Tags, Wallet, Save, FolderUp
 } from 'lucide-react'
 import './ProfilePage.css'
 
@@ -16,15 +16,16 @@ export default function ProfilePage() {
   const navigate = useNavigate()
   const { user, logout, updateUser } = useAuth()
   const { theme, toggleTheme } = useTheme()
-  const { currency, setCurrency, transactions, clearAllData } = useFinance()
+  const { currency, setCurrency, transactions, clearAllData, exportData, importData } = useFinance()
   const { addToast } = useToast()
+  const restoreInputRef = useRef(null)
 
   const [showCurrency, setShowCurrency] = useState(false)
   const [showClearConfirm, setShowClearConfirm] = useState(false)
   const [editingName, setEditingName] = useState(false)
   const [newName, setNewName] = useState(user?.name || '')
 
-  const handleExport = () => {
+  const handleExportCSV = () => {
     const csvRows = [
       'Data,Tipo,Categoria,Descrição,Valor',
       ...transactions.map(t =>
@@ -38,7 +39,34 @@ export default function ProfilePage() {
     a.download = `finflow_transacoes_${new Date().toISOString().split('T')[0]}.csv`
     a.click()
     URL.revokeObjectURL(url)
-    addToast('Dados exportados!', 'success')
+    addToast('CSV exportado!', 'success')
+  }
+
+  const handleBackup = () => {
+    const backup = exportData()
+    const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `finflow_backup_${new Date().toISOString().split('T')[0]}.json`
+    a.click()
+    URL.revokeObjectURL(url)
+    addToast('Backup completo salvo!', 'success')
+  }
+
+  const handleRestore = async (e) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    try {
+      const text = await file.text()
+      const jsonData = JSON.parse(text)
+      importData(jsonData)
+      addToast(`Backup restaurado! ${jsonData.data?.transactions?.length || 0} transações carregadas`, 'success')
+    } catch (err) {
+      addToast(err.message || 'Erro ao restaurar backup', 'error')
+    } finally {
+      if (restoreInputRef.current) restoreInputRef.current.value = ''
+    }
   }
 
   const handleClear = () => {
@@ -103,6 +131,18 @@ export default function ProfilePage() {
           </div>
         </button>
 
+        {/* Accounts */}
+        <button className="prof-item" onClick={() => navigate('/accounts')} id="btn-accounts">
+          <div className="prof-item-icon" style={{ background: 'rgba(0, 208, 156, 0.12)', color: 'var(--success-500)' }}>
+            <Wallet size={20} />
+          </div>
+          <div className="prof-item-info">
+            <span className="prof-item-label">Contas</span>
+            <span className="prof-item-value">Gerenciar carteiras</span>
+          </div>
+          <ChevronRight size={18} className="prof-item-arrow" />
+        </button>
+
         {/* Categories */}
         <button className="prof-item" onClick={() => navigate('/categories')} id="btn-categories">
           <div className="prof-item-icon" style={{ background: 'rgba(253, 121, 168, 0.12)', color: '#FD79A8' }}>
@@ -126,15 +166,45 @@ export default function ProfilePage() {
           </div>
           <ChevronRight size={18} className="prof-item-arrow" />
         </button>
+      </section>
 
-        {/* Export */}
-        <button className="prof-item" onClick={handleExport} id="btn-export">
+      {/* Backup & Export */}
+      <section className="prof-section">
+        <h3 className="section-title">Backup & Dados</h3>
+
+        {/* Full Backup */}
+        <button className="prof-item" onClick={handleBackup} id="btn-backup">
+          <div className="prof-item-icon" style={{ background: 'rgba(108, 92, 231, 0.12)', color: 'var(--primary-500)' }}>
+            <Save size={20} />
+          </div>
+          <div className="prof-item-info">
+            <span className="prof-item-label">Backup Completo</span>
+            <span className="prof-item-value">Exportar todos os dados (JSON)</span>
+          </div>
+          <ChevronRight size={18} className="prof-item-arrow" />
+        </button>
+
+        {/* Restore */}
+        <button className="prof-item" onClick={() => restoreInputRef.current?.click()} id="btn-restore">
+          <div className="prof-item-icon" style={{ background: 'rgba(253, 203, 110, 0.12)', color: '#FDCB6E' }}>
+            <FolderUp size={20} />
+          </div>
+          <div className="prof-item-info">
+            <span className="prof-item-label">Restaurar Backup</span>
+            <span className="prof-item-value">Importar arquivo JSON</span>
+          </div>
+          <ChevronRight size={18} className="prof-item-arrow" />
+        </button>
+        <input type="file" ref={restoreInputRef} onChange={handleRestore} accept=".json" style={{ display: 'none' }} />
+
+        {/* Export CSV */}
+        <button className="prof-item" onClick={handleExportCSV} id="btn-export">
           <div className="prof-item-icon" style={{ background: 'rgba(116, 185, 255, 0.12)', color: '#74B9FF' }}>
             <Download size={20} />
           </div>
           <div className="prof-item-info">
-            <span className="prof-item-label">Exportar dados</span>
-            <span className="prof-item-value">Baixar CSV com transações</span>
+            <span className="prof-item-label">Exportar CSV</span>
+            <span className="prof-item-value">Baixar transações em planilha</span>
           </div>
           <ChevronRight size={18} className="prof-item-arrow" />
         </button>
@@ -168,7 +238,7 @@ export default function ProfilePage() {
 
       {/* App Info */}
       <div className="prof-footer">
-        <p>FinFlow v1.0.0</p>
+        <p>FinFlow v2.0.0</p>
         <p>Feito com 💜</p>
       </div>
 

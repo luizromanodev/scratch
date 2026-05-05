@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useFinance } from '../context/FinanceContext'
 import { formatCurrency } from '../utils/formatCurrency'
@@ -9,7 +9,8 @@ import { Doughnut } from 'react-chartjs-2'
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js'
 import {
   TrendingUp, TrendingDown, Eye, EyeOff, ChevronLeft, ChevronRight,
-  Plus, Minus, ArrowRight, PieChart, Target, BarChart3, Search, Settings
+  Plus, Minus, ArrowRight, PieChart, Target, BarChart3, Search, Settings,
+  Wallet, PiggyBank, Banknote, ArrowRightLeft, CreditCard, X
 } from 'lucide-react'
 import './DashboardPage.css'
 import Onboarding from '../components/UI/Onboarding'
@@ -20,7 +21,7 @@ ChartJS.register(ArcElement, Tooltip, Legend)
 
 export default function DashboardPage() {
   const { user } = useAuth()
-  const { currency, categories, getBalance, getTransactionsByMonth, getExpensesByCategory } = useFinance()
+  const { currency, categories, accounts, tags, creditCards, getBalance, getTransactionsByMonth, getExpensesByCategory, getAccountBalance } = useFinance()
   const navigate = useNavigate()
 
   const [showBalance, setShowBalance] = useState(true)
@@ -192,8 +193,13 @@ export default function DashboardPage() {
 
       {/* Widget Settings Popup */}
       {showWidgetSettings && (
+        <>
+        <div className="dash-widget-overlay" onClick={() => setShowWidgetSettings(false)} />
         <div className="dash-widget-panel animate-fade-in-up">
-          <h4 className="dash-widget-title">Seções visíveis</h4>
+          <div className="dash-widget-header">
+            <h4 className="dash-widget-title">Seções visíveis</h4>
+            <button className="dash-widget-close" onClick={() => setShowWidgetSettings(false)}><X size={18} /></button>
+          </div>
           {[
             { key: 'planning', label: 'Planejamento', desc: 'Orçamentos, metas, relatórios' },
             { key: 'chart', label: 'Gráfico de categorias', desc: 'Distribuição de gastos' },
@@ -210,6 +216,7 @@ export default function DashboardPage() {
             </button>
           ))}
         </div>
+        </>
       )}
 
       {/* Planejamento */}
@@ -240,6 +247,68 @@ export default function DashboardPage() {
           </button>
         </div>
       </section>
+      )}
+
+      {/* Accounts */}
+      {accounts.length > 0 && (
+        <section className="dash-section animate-fade-in-up" style={{ animationDelay: '80ms' }}>
+          <div className="section-header">
+            <h2 className="section-title">Suas Contas</h2>
+            <button className="section-link" onClick={() => navigate('/accounts')}>
+              Gerenciar <ArrowRight size={14} />
+            </button>
+          </div>
+          <div className="dash-accounts-scroll">
+            {accounts.map(acc => {
+              const bal = getAccountBalance(acc.id)
+              return (
+                <div key={acc.id} className="dash-account-card" style={{ borderLeft: `3px solid ${acc.color}` }} onClick={() => navigate('/accounts')}>
+                  <div className="dash-acc-icon" style={{ background: acc.color + '18', color: acc.color }}>
+                    <Wallet size={18} />
+                  </div>
+                  <div className="dash-acc-info">
+                    <span className="dash-acc-name">{acc.name}</span>
+                    <span className={`dash-acc-bal ${bal >= 0 ? 'positive' : 'negative'}`}>
+                      {showBalance ? formatCurrency(bal, currency) : '•••'}
+                    </span>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </section>
+      )}
+
+      {/* Credit Cards */}
+      {creditCards.length > 0 && (
+        <section className="dash-section animate-fade-in-up" style={{ animationDelay: '100ms' }}>
+          <div className="section-header">
+            <h2 className="section-title">Seus Cartões</h2>
+            <button className="section-link" onClick={() => navigate('/profile')}>
+              Gerenciar <ArrowRight size={14} />
+            </button>
+          </div>
+          <div className="dash-accounts-scroll">
+            {creditCards.map(card => (
+              <Link key={card.id} to={`/card/${card.id}`} className="dash-cc-card" style={{ borderTop: `3px solid ${card.color || 'var(--primary-500)'}`, textDecoration: 'none', color: 'inherit' }}>
+                <div className="dash-cc-icon">
+                  <CreditCard size={20} />
+                </div>
+                <div className="dash-cc-info">
+                  <span className="dash-cc-name">{card.name}</span>
+                  <span className="dash-cc-label">Fatura atual</span>
+                  <span className="dash-cc-invoice">
+                    {showBalance ? formatCurrency(card.currentInvoice || 0, currency) : '•••'}
+                  </span>
+                </div>
+                <div className="dash-cc-limit">
+                  <span className="dash-cc-limit-label">Limite</span>
+                  <span className="dash-cc-limit-value">{formatCurrency(card.limit || 0, currency)}</span>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
       )}
 
       {/* Chart */}
@@ -301,6 +370,16 @@ export default function DashboardPage() {
                   <div className="tx-info">
                     <span className="tx-desc">{tx.description || cat?.name}</span>
                     <span className="tx-date">{getRelativeDate(tx.date)}</span>
+                    {(tx.tags || []).length > 0 && (
+                      <div className="tx-tags">
+                        {(tx.tags || []).map(tid => {
+                          const tag = tags.find(t => t.id === tid)
+                          return tag ? (
+                            <span key={tag.id} className="tx-tag-badge" style={{ background: tag.color + '20', color: tag.color }}>{tag.name}</span>
+                          ) : null
+                        })}
+                      </div>
+                    )}
                   </div>
                   <span className={`tx-amount ${tx.type}`}>
                     {tx.type === 'income' ? '+' : '-'}{formatCurrency(tx.amount, currency)}

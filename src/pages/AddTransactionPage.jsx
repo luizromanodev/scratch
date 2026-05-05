@@ -5,14 +5,15 @@ import { useToast } from '../components/UI/Toast'
 import { getCategoriesByType, CategoryIcon, iconMap } from '../utils/categories'
 import { getToday } from '../utils/dateUtils'
 import { formatCurrency } from '../utils/formatCurrency'
-import { ArrowLeft, Check, Plus } from 'lucide-react'
+import { ArrowLeft, Check, Plus, Calculator, X, Tag } from 'lucide-react'
 import Modal from '../components/UI/Modal'
+import InlineCalculator from '../components/UI/InlineCalculator'
 import './AddTransactionPage.css'
 
 export default function AddTransactionPage() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
-  const { addTransaction, updateTransaction, transactions, categories, addCategory, creditCards } = useFinance()
+  const { addTransaction, updateTransaction, transactions, categories, addCategory, creditCards, accounts, tags, addTag } = useFinance()
   const { addToast } = useToast()
 
   // Edit mode: ?edit=<id>
@@ -28,12 +29,23 @@ export default function AddTransactionPage() {
   const [isRecurring, setIsRecurring] = useState(editTx?.isRecurring || false)
   const [installments, setInstallments] = useState(editTx?.installments || 1)
   const [creditCardId, setCreditCardId] = useState(editTx?.creditCardId || '')
+  const [accountId, setAccountId] = useState(editTx?.accountId || accounts[0]?.id || 'main')
+  const [selectedTags, setSelectedTags] = useState(editTx?.tags || [])
+
+  // Calculator
+  const [showCalc, setShowCalc] = useState(false)
+  const [calcExpression, setCalcExpression] = useState('')
 
   // New category modal
   const [showNewCat, setShowNewCat] = useState(false)
   const [newCatName, setNewCatName] = useState('')
   const [newCatColor, setNewCatColor] = useState('#6C5CE7')
   const [newCatIcon, setNewCatIcon] = useState('MoreHorizontal')
+
+  // New tag modal
+  const [showNewTag, setShowNewTag] = useState(false)
+  const [newTagName, setNewTagName] = useState('')
+  const [newTagColor, setNewTagColor] = useState('#6C5CE7')
 
   const filteredCategories = getCategoriesByType(categories, type)
 
@@ -46,8 +58,25 @@ export default function AddTransactionPage() {
   const iconOptions = Object.keys(iconMap)
 
   const handleAmountChange = (e) => {
-    const val = e.target.value.replace(/[^0-9.,]/g, '').replace(',', '.')
+    const val = e.target.value.replace(/[^0-9.,+\-×÷*\/]/g, '').replace(',', '.')
     setAmount(val)
+    // Detect math operators to show calculator
+    if (/[+\-×÷*\/]/.test(val.replace(/^-/, ''))) {
+      setCalcExpression(val.replace(/\*/g, '×').replace(/\//g, '÷'))
+      setShowCalc(true)
+    }
+  }
+
+  const handleCalcConfirm = (result) => {
+    setAmount(String(result))
+    setShowCalc(false)
+    setCalcExpression('')
+  }
+
+  const toggleTag = (tagId) => {
+    setSelectedTags(prev => 
+      prev.includes(tagId) ? prev.filter(id => id !== tagId) : [...prev, tagId]
+    )
   }
 
   const handleSubmit = () => {
@@ -70,6 +99,8 @@ export default function AddTransactionPage() {
         date,
         isRecurring,
         creditCardId: type === 'expense' ? (creditCardId || null) : null,
+        accountId,
+        tags: selectedTags,
       })
       addToast('Transação atualizada!', 'success')
     } else {
@@ -83,6 +114,8 @@ export default function AddTransactionPage() {
         installments: type === 'expense' ? parseInt(installments) : 1,
         creditCardId: type === 'expense' ? (creditCardId || null) : null,
         bankId: null,
+        accountId,
+        tags: selectedTags,
       })
       addToast(
         type === 'income' ? 'Receita adicionada!' : 'Despesa adicionada!',
@@ -104,6 +137,15 @@ export default function AddTransactionPage() {
     setShowNewCat(false)
     setNewCatName('')
     addToast('Categoria criada!', 'success')
+  }
+
+  const handleAddTag = () => {
+    if (!newTagName.trim()) return
+    const tag = addTag({ name: newTagName.trim(), color: newTagColor })
+    setSelectedTags(prev => [...prev, tag.id])
+    setShowNewTag(false)
+    setNewTagName('')
+    addToast('Tag criada!', 'success')
   }
 
   return (
@@ -149,7 +191,41 @@ export default function AddTransactionPage() {
           autoFocus
           id="input-amount"
         />
+        <button
+          className={`calc-toggle-btn ${showCalc ? 'active' : ''}`}
+          onClick={() => { setShowCalc(!showCalc); if (!showCalc) setCalcExpression(amount) }}
+          type="button"
+          aria-label="Calculadora"
+        >
+          <Calculator size={18} />
+        </button>
       </div>
+
+      {/* Inline Calculator */}
+      {showCalc && (
+        <InlineCalculator
+          expression={calcExpression}
+          onExpressionChange={setCalcExpression}
+          onConfirm={handleCalcConfirm}
+        />
+      )}
+
+      {/* Account Selector */}
+      {accounts.length > 1 && (
+        <section className="add-section">
+          <label className="input-label">Conta</label>
+          <select
+            className="add-input select"
+            value={accountId}
+            onChange={e => setAccountId(e.target.value)}
+            style={{ padding: 'var(--space-3)', width: '100%' }}
+          >
+            {accounts.map(acc => (
+              <option key={acc.id} value={acc.id}>{acc.name}</option>
+            ))}
+          </select>
+        </section>
+      )}
 
       {/* Categories */}
       <section className="add-section">
@@ -171,6 +247,34 @@ export default function AddTransactionPage() {
               <span>{cat.name}</span>
             </button>
           ))}
+        </div>
+      </section>
+
+      {/* Tags */}
+      <section className="add-section">
+        <div className="section-header">
+          <h2 className="section-title">Tags</h2>
+          <button className="add-cat-btn" onClick={() => setShowNewTag(true)}>
+            <Plus size={14} /> Nova
+          </button>
+        </div>
+        <div className="tags-grid">
+          {tags.map(tag => (
+            <button
+              key={tag.id}
+              className={`tag-chip ${selectedTags.includes(tag.id) ? 'active' : ''}`}
+              onClick={() => toggleTag(tag.id)}
+              style={selectedTags.includes(tag.id) ? { background: tag.color + '20', borderColor: tag.color, color: tag.color } : {}}
+            >
+              <Tag size={12} />
+              <span>{tag.name}</span>
+            </button>
+          ))}
+          {tags.length === 0 && (
+            <p style={{ fontSize: 'var(--font-sm)', color: 'var(--text-tertiary)', margin: 0 }}>
+              Nenhuma tag criada
+            </p>
+          )}
         </div>
       </section>
 
@@ -314,6 +418,40 @@ export default function AddTransactionPage() {
           <button className="add-submit income" onClick={handleAddCategory} disabled={!newCatName.trim()}>
             <Check size={20} />
             <span>Criar Categoria</span>
+          </button>
+        </div>
+      </Modal>
+
+      {/* New Tag Modal */}
+      <Modal isOpen={showNewTag} onClose={() => setShowNewTag(false)} title="Nova Tag">
+        <div className="new-cat-form">
+          <div className="form-group">
+            <label>Nome da tag</label>
+            <input
+              type="text"
+              className="add-input"
+              placeholder="Ex: viagem SP"
+              value={newTagName}
+              onChange={e => setNewTagName(e.target.value)}
+              autoFocus
+            />
+          </div>
+          <div className="form-group">
+            <label>Cor</label>
+            <div className="color-grid">
+              {colorOptions.map(c => (
+                <button
+                  key={c}
+                  className={`color-opt ${newTagColor === c ? 'active' : ''}`}
+                  style={{ background: c }}
+                  onClick={() => setNewTagColor(c)}
+                />
+              ))}
+            </div>
+          </div>
+          <button className="add-submit income" onClick={handleAddTag} disabled={!newTagName.trim()}>
+            <Tag size={18} />
+            <span>Criar Tag</span>
           </button>
         </div>
       </Modal>

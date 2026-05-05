@@ -6,13 +6,13 @@ import { formatCurrency } from '../utils/formatCurrency'
 import { groupByDate } from '../utils/dateUtils'
 import { getCategoryById, CategoryIcon } from '../utils/categories'
 import { parseImportFile } from '../utils/importUtils'
-import { Search, SlidersHorizontal, Trash2, X, FileUp, Pencil, ChevronDown } from 'lucide-react'
+import { Search, SlidersHorizontal, Trash2, X, FileUp, Pencil, ChevronDown, Tag } from 'lucide-react'
 import { useRef } from 'react'
 import SwipeableRow from '../components/UI/SwipeableRow'
 import './TransactionsPage.css'
 
 export default function TransactionsPage() {
-  const { transactions, categories, currency, creditCards, deleteTransaction, addTransaction } = useFinance()
+  const { transactions, categories, currency, creditCards, accounts, tags, deleteTransaction, addTransaction } = useFinance()
   const { addToast } = useToast()
   const navigate = useNavigate()
   const fileInputRef = useRef(null)
@@ -25,6 +25,8 @@ export default function TransactionsPage() {
   const [filterPeriod, setFilterPeriod] = useState('all') // all, week, month, custom
   const [filterCategory, setFilterCategory] = useState('all')
   const [filterCard, setFilterCard] = useState('all')
+  const [filterAccount, setFilterAccount] = useState('all')
+  const [filterTag, setFilterTag] = useState('all')
   const [filterMinValue, setFilterMinValue] = useState('')
   const [filterMaxValue, setFilterMaxValue] = useState('')
   const [sortBy, setSortBy] = useState('date') // date, value_asc, value_desc
@@ -32,13 +34,15 @@ export default function TransactionsPage() {
   const [customDateTo, setCustomDateTo] = useState('')
 
   const hasActiveFilters = filterType !== 'all' || filterPeriod !== 'all' || filterCategory !== 'all' || 
-    filterCard !== 'all' || filterMinValue || filterMaxValue || sortBy !== 'date'
+    filterCard !== 'all' || filterAccount !== 'all' || filterTag !== 'all' || filterMinValue || filterMaxValue || sortBy !== 'date'
 
   const clearFilters = () => {
     setFilterType('all')
     setFilterPeriod('all')
     setFilterCategory('all')
     setFilterCard('all')
+    setFilterAccount('all')
+    setFilterTag('all')
     setFilterMinValue('')
     setFilterMaxValue('')
     setSortBy('date')
@@ -57,7 +61,11 @@ export default function TransactionsPage() {
       const q = search.toLowerCase()
       txs = txs.filter(t =>
         (t.description || '').toLowerCase().includes(q) ||
-        (getCategoryById(categories, t.category)?.name || '').toLowerCase().includes(q)
+        (getCategoryById(categories, t.category)?.name || '').toLowerCase().includes(q) ||
+        (t.tags || []).some(tid => {
+          const tag = tags.find(tg => tg.id === tid)
+          return tag && tag.name.toLowerCase().includes(q)
+        })
       )
     }
 
@@ -80,14 +88,16 @@ export default function TransactionsPage() {
     }
 
     // Category filter
-    if (filterCategory !== 'all') {
-      txs = txs.filter(t => t.category === filterCategory)
-    }
+    if (filterCategory !== 'all') txs = txs.filter(t => t.category === filterCategory)
 
     // Card filter
-    if (filterCard !== 'all') {
-      txs = txs.filter(t => t.creditCardId === filterCard)
-    }
+    if (filterCard !== 'all') txs = txs.filter(t => t.creditCardId === filterCard)
+
+    // Account filter
+    if (filterAccount !== 'all') txs = txs.filter(t => t.accountId === filterAccount)
+
+    // Tag filter
+    if (filterTag !== 'all') txs = txs.filter(t => (t.tags || []).includes(filterTag))
 
     // Value range
     const minV = parseFloat(filterMinValue)
@@ -105,7 +115,7 @@ export default function TransactionsPage() {
     }
 
     return txs
-  }, [transactions, filterType, search, categories, filterPeriod, filterCategory, filterCard, filterMinValue, filterMaxValue, sortBy, customDateFrom, customDateTo])
+  }, [transactions, filterType, search, categories, tags, filterPeriod, filterCategory, filterCard, filterAccount, filterTag, filterMinValue, filterMaxValue, sortBy, customDateFrom, customDateTo])
 
   const grouped = useMemo(() => groupByDate(filtered), [filtered])
 
@@ -117,23 +127,18 @@ export default function TransactionsPage() {
   const handleImport = async (e) => {
     const file = e.target.files?.[0]
     if (!file) return
-
     try {
       addToast('Lendo arquivo...', 'info')
       const importedTxs = await parseImportFile(file)
-      
       if (importedTxs.length === 0) {
         addToast('Nenhuma transação encontrada no arquivo', 'warning')
         return
       }
-
       importedTxs.forEach(tx => addTransaction(tx))
       addToast(`${importedTxs.length} transações importadas com sucesso!`, 'success')
-      
     } catch (err) {
       addToast(err.message || 'Erro ao importar arquivo', 'error')
     } finally {
-      // Reset input
       if (fileInputRef.current) fileInputRef.current.value = ''
     }
   }
@@ -163,13 +168,7 @@ export default function TransactionsPage() {
         </div>
       </header>
 
-      <input 
-        type="file" 
-        ref={fileInputRef} 
-        onChange={handleImport} 
-        accept=".csv,.ofx" 
-        style={{ display: 'none' }} 
-      />
+      <input type="file" ref={fileInputRef} onChange={handleImport} accept=".csv,.ofx" style={{ display: 'none' }} />
 
       {/* Search */}
       <div className="txp-search">
@@ -189,7 +188,7 @@ export default function TransactionsPage() {
         )}
       </div>
 
-      {/* Basic Type Filters - always visible */}
+      {/* Basic Type Filters */}
       <div className="txp-filters">
         {['all', 'income', 'expense'].map(f => (
           <button
@@ -209,19 +208,8 @@ export default function TransactionsPage() {
           <div className="txp-adv-group">
             <label className="txp-adv-label">Período</label>
             <div className="txp-adv-chips">
-              {[
-                ['all', 'Tudo'],
-                ['week', 'Esta semana'],
-                ['month', 'Este mês'],
-                ['custom', 'Personalizado'],
-              ].map(([value, label]) => (
-                <button
-                  key={value}
-                  className={`txp-adv-chip ${filterPeriod === value ? 'active' : ''}`}
-                  onClick={() => setFilterPeriod(value)}
-                >
-                  {label}
-                </button>
+              {[['all', 'Tudo'], ['week', 'Esta semana'], ['month', 'Este mês'], ['custom', 'Personalizado']].map(([value, label]) => (
+                <button key={value} className={`txp-adv-chip ${filterPeriod === value ? 'active' : ''}`} onClick={() => setFilterPeriod(value)}>{label}</button>
               ))}
             </div>
             {filterPeriod === 'custom' && (
@@ -237,34 +225,50 @@ export default function TransactionsPage() {
           <div className="txp-adv-group">
             <label className="txp-adv-label">Categoria</label>
             <div className="txp-adv-select-wrapper">
-              <select 
-                className="txp-adv-select" 
-                value={filterCategory} 
-                onChange={e => setFilterCategory(e.target.value)}
-              >
+              <select className="txp-adv-select" value={filterCategory} onChange={e => setFilterCategory(e.target.value)}>
                 <option value="all">Todas as categorias</option>
-                {usedCategories.map(c => (
-                  <option key={c.id} value={c.id}>{c.name}</option>
-                ))}
+                {usedCategories.map(c => (<option key={c.id} value={c.id}>{c.name}</option>))}
               </select>
               <ChevronDown size={14} className="txp-adv-select-icon" />
             </div>
           </div>
+
+          {/* Account */}
+          {accounts.length > 1 && (
+            <div className="txp-adv-group">
+              <label className="txp-adv-label">Conta</label>
+              <div className="txp-adv-select-wrapper">
+                <select className="txp-adv-select" value={filterAccount} onChange={e => setFilterAccount(e.target.value)}>
+                  <option value="all">Todas as contas</option>
+                  {accounts.map(a => (<option key={a.id} value={a.id}>{a.name}</option>))}
+                </select>
+                <ChevronDown size={14} className="txp-adv-select-icon" />
+              </div>
+            </div>
+          )}
+
+          {/* Tag */}
+          {tags.length > 0 && (
+            <div className="txp-adv-group">
+              <label className="txp-adv-label">Tag</label>
+              <div className="txp-adv-select-wrapper">
+                <select className="txp-adv-select" value={filterTag} onChange={e => setFilterTag(e.target.value)}>
+                  <option value="all">Todas as tags</option>
+                  {tags.map(t => (<option key={t.id} value={t.id}>{t.name}</option>))}
+                </select>
+                <ChevronDown size={14} className="txp-adv-select-icon" />
+              </div>
+            </div>
+          )}
 
           {/* Credit Card */}
           {creditCards.length > 0 && (
             <div className="txp-adv-group">
               <label className="txp-adv-label">Cartão de crédito</label>
               <div className="txp-adv-select-wrapper">
-                <select 
-                  className="txp-adv-select" 
-                  value={filterCard} 
-                  onChange={e => setFilterCard(e.target.value)}
-                >
+                <select className="txp-adv-select" value={filterCard} onChange={e => setFilterCard(e.target.value)}>
                   <option value="all">Todos os cartões</option>
-                  {creditCards.map(c => (
-                    <option key={c.id} value={c.id}>{c.name}</option>
-                  ))}
+                  {creditCards.map(c => (<option key={c.id} value={c.id}>{c.name}</option>))}
                 </select>
                 <ChevronDown size={14} className="txp-adv-select-icon" />
               </div>
@@ -275,21 +279,9 @@ export default function TransactionsPage() {
           <div className="txp-adv-group">
             <label className="txp-adv-label">Faixa de valor</label>
             <div className="txp-adv-value-range">
-              <input 
-                type="number" 
-                className="txp-adv-value-input" 
-                placeholder="Min" 
-                value={filterMinValue} 
-                onChange={e => setFilterMinValue(e.target.value)} 
-              />
+              <input type="number" className="txp-adv-value-input" placeholder="Min" value={filterMinValue} onChange={e => setFilterMinValue(e.target.value)} />
               <span className="txp-adv-date-sep">até</span>
-              <input 
-                type="number" 
-                className="txp-adv-value-input" 
-                placeholder="Max" 
-                value={filterMaxValue} 
-                onChange={e => setFilterMaxValue(e.target.value)} 
-              />
+              <input type="number" className="txp-adv-value-input" placeholder="Max" value={filterMaxValue} onChange={e => setFilterMaxValue(e.target.value)} />
             </div>
           </div>
 
@@ -297,32 +289,19 @@ export default function TransactionsPage() {
           <div className="txp-adv-group">
             <label className="txp-adv-label">Ordenar por</label>
             <div className="txp-adv-chips">
-              {[
-                ['date', 'Data (recente)'],
-                ['value_desc', 'Maior valor'],
-                ['value_asc', 'Menor valor'],
-              ].map(([value, label]) => (
-                <button
-                  key={value}
-                  className={`txp-adv-chip ${sortBy === value ? 'active' : ''}`}
-                  onClick={() => setSortBy(value)}
-                >
-                  {label}
-                </button>
+              {[['date', 'Data (recente)'], ['value_desc', 'Maior valor'], ['value_asc', 'Menor valor']].map(([value, label]) => (
+                <button key={value} className={`txp-adv-chip ${sortBy === value ? 'active' : ''}`} onClick={() => setSortBy(value)}>{label}</button>
               ))}
             </div>
           </div>
 
-          {/* Clear button */}
+          {/* Clear */}
           {hasActiveFilters && (
-            <button className="txp-adv-clear" onClick={clearFilters}>
-              <X size={14} /> Limpar filtros
-            </button>
+            <button className="txp-adv-clear" onClick={clearFilters}><X size={14} /> Limpar filtros</button>
           )}
         </div>
       )}
 
-      {/* Results count */}
       <p className="txp-count">{filtered.length} transação(ões)</p>
 
       {/* Transaction Groups */}
@@ -339,6 +318,7 @@ export default function TransactionsPage() {
               <div className="transaction-list">
                 {group.items.map(tx => {
                   const cat = getCategoryById(categories, tx.category)
+                  const txTags = (tx.tags || []).map(tid => tags.find(t => t.id === tid)).filter(Boolean)
                   return (
                     <SwipeableRow
                       key={tx.id}
@@ -354,6 +334,15 @@ export default function TransactionsPage() {
                         <div className="tx-info">
                           <span className="tx-desc">{tx.description || cat?.name}</span>
                           <span className="tx-date">{cat?.name}</span>
+                          {txTags.length > 0 && (
+                            <div className="tx-tags">
+                              {txTags.map(tag => (
+                                <span key={tag.id} className="tx-tag-badge" style={{ background: tag.color + '20', color: tag.color }}>
+                                  {tag.name}
+                                </span>
+                              ))}
+                            </div>
+                          )}
                         </div>
                         <div className="txp-actions">
                           <span className={`tx-amount ${tx.type}`}>

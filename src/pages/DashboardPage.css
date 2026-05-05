@@ -525,3 +525,310 @@
 }
 
 .empty-cta:hover { background: var(--primary-600); transform: translateY(-1px); }
+
+/* Account Cards on Dashboard */
+.dash-accounts-scroll {
+  display: flex;
+  gap: var(--space-3);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding-bottom: var(--space-1);
+}
+.dash-accounts-scroll::-webkit-scrollbar { display: none; }
+
+.dash-account-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 180px;
+  padding: var(--space-3) var(--space-4);
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.dash-account-card:hover {
+  box-shadow: var(--shadow-sm);
+  transform: translateY(-1px);
+}
+
+.dash-acc-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.dash-acc-info {
+  min-width: 0;
+}
+
+.dash-acc-name {
+  display: block;
+  font-size: var(--font-sm);
+  font-weight: var(--weight-medium);
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dash-acc-bal {
+  display: block;
+  font-size: var(--font-base);
+  font-weight: var(--weight-bold);
+}
+
+.dash-acc-bal.positive { color: var(--success-500); }
+.dash-acc-bal.negative { color: var(--danger-500); }
+
+/* Tag badges (reuse from TransactionsPage) */
+.tx-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 2px;
+}
+
+.tx-tag-badge {
+  display: inline-block;
+  padding: 1px 6px;
+  border-radius: var(--radius-full);
+  font-size: 10px;
+  font-weight: var(--weight-semibold);
+  letter-spacing: 0.3px;
+}
+
+/* ═══════════════════════════════
+   Widget Settings Panel
+   ═══════════════════════════════ */
+
+.dash-widget-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 90;
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.dash-widget-panel {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 32px);
+  max-width: 400px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-4);
+  z-index: 100;
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.dash-widget-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-2);
+}
+
+.dash-widget-title {
+  font-size: var(--font-md);
+  font-weight: var(--weight-bold);
+  color: var(--text-primary);
+}
+
+.dash-widget-close {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-tertiary);
+  border: none;
+  border-radius: var(--radius-full);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.dash-widget-close:hover {
+  background: var(--danger-500);
+  color: white;
+}
+
+.dash-widget-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  background: var(--bg-tertiary);
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  text-align: left;
+  width: 100%;
+}
+
+.dash-widget-item:hover {
+  border-color: var(--border-color);
+}
+
+.dash-widget-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.dash-widget-label {
+  font-size: var(--font-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--text-primary);
+}
+
+.dash-widget-desc {
+  font-size: var(--font-xs);
+  color: var(--text-tertiary);
+}
+
+/* Mini Toggle Switch */
+.toggle-switch-mini {
+  width: 38px;
+  height: 22px;
+  border-radius: var(--radius-full);
+  background: var(--neutral-300);
+  position: relative;
+  transition: background var(--transition-fast);
+  flex-shrink: 0;
+}
+
+[data-theme="dark"] .toggle-switch-mini {
+  background: var(--neutral-600);
+}
+
+.toggle-switch-mini.on {
+  background: var(--primary-500);
+}
+
+.toggle-thumb-mini {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: white;
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  transition: transform var(--transition-fast);
+  box-shadow: var(--shadow-sm);
+}
+
+.toggle-switch-mini.on .toggle-thumb-mini {
+  transform: translateX(16px);
+}
+
+/* ═══════════════════════════════
+   Credit Card Section
+   ═══════════════════════════════ */
+
+.dash-cc-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 240px;
+  padding: var(--space-4);
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-lg);
+  flex-shrink: 0;
+  transition: all var(--transition-fast);
+  cursor: pointer;
+}
+
+.dash-cc-card:hover {
+  box-shadow: var(--shadow-sm);
+  transform: translateY(-1px);
+}
+
+.dash-cc-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(108, 92, 231, 0.12);
+  color: var(--primary-500);
+  flex-shrink: 0;
+}
+
+.dash-cc-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  flex: 1;
+  min-width: 0;
+}
+
+.dash-cc-name {
+  font-size: var(--font-sm);
+  font-weight: var(--weight-bold);
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dash-cc-label {
+  font-size: 10px;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.dash-cc-invoice {
+  font-size: var(--font-base);
+  font-weight: var(--weight-bold);
+  color: var(--danger-500);
+}
+
+.dash-cc-limit {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 1px;
+  flex-shrink: 0;
+}
+
+.dash-cc-limit-label {
+  font-size: 10px;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+}
+
+.dash-cc-limit-value {
+  font-size: var(--font-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--text-secondary);
+}
+
+

@@ -1,0 +1,36 @@
+/* Offline Indicator */
+.offline-banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: var(--z-toast);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  font-size: var(--font-sm);
+  font-weight: var(--weight-semibold);
+  animation: slideDownBanner 0.3s ease-out;
+}
+
+.offline-banner.offline {
+  background: linear-gradient(135deg, #E17055 0%, #D63031 100%);
+  color: white;
+}
+
+.offline-banner.online {
+  background: linear-gradient(135deg, #00B894 0%, #00D09C 100%);
+  color: white;
+  animation: slideDownBanner 0.3s ease-out, fadeOutBanner 0.5s 2.5s ease-out forwards;
+}
+
+@keyframes slideDownBanner {
+  from { transform: translateY(-100%); }
+  to { transform: translateY(0); }
+}
+
+@keyframes fadeOutBanner {
+  to { opacity: 0; transform: translateY(-100%); }
+}

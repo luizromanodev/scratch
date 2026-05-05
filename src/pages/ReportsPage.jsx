@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useRef, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useFinance } from '../context/FinanceContext'
 import { formatCurrency } from '../utils/formatCurrency'
@@ -11,8 +11,9 @@ import {
 } from 'chart.js'
 import {
   ArrowLeft, TrendingUp, TrendingDown, Wallet,
-  ChevronLeft, ChevronRight, BarChart3, PieChart, ArrowUpRight, ArrowDownRight
+  ChevronLeft, ChevronRight, BarChart3, PieChart, ArrowUpRight, ArrowDownRight, Share2
 } from 'lucide-react'
+import html2canvas from 'html2canvas'
 import './ReportsPage.css'
 
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement)
@@ -23,6 +24,8 @@ export default function ReportsPage() {
   const [month, setMonth] = useState(getCurrentMonth())
   const [year, setYear] = useState(getCurrentYear())
   const [chartTab, setChartTab] = useState('bar') // 'bar' | 'category'
+  const reportRef = useRef(null)
+  const [sharing, setSharing] = useState(false)
 
   const balance = useMemo(() => getBalance(month, year), [month, year, getBalance])
   const expensesByCategory = useMemo(() => getExpensesByCategory(month, year), [month, year, getExpensesByCategory])
@@ -79,6 +82,40 @@ export default function ReportsPage() {
 
   const prevMonth = () => { if (month === 0) { setMonth(11); setYear(y => y - 1) } else setMonth(m => m - 1) }
   const nextMonth = () => { if (month === 11) { setMonth(0); setYear(y => y + 1) } else setMonth(m => m + 1) }
+
+  const handleShare = useCallback(async () => {
+    if (!reportRef.current || sharing) return
+    setSharing(true)
+    try {
+      const canvas = await html2canvas(reportRef.current, {
+        backgroundColor: '#0F0F14',
+        scale: 2,
+        useCORS: true,
+        logging: false,
+      })
+      canvas.toBlob(async (blob) => {
+        if (!blob) { setSharing(false); return }
+        const file = new File([blob], `finflow_relatorio_${getMonthName(month)}_${year}.png`, { type: 'image/png' })
+        
+        if (navigator.canShare?.({ files: [file] })) {
+          try {
+            await navigator.share({ files: [file], title: `FinFlow — Relatório ${getMonthName(month)} ${year}` })
+          } catch { /* user cancelled */ }
+        } else {
+          // Fallback: download
+          const url = URL.createObjectURL(blob)
+          const a = document.createElement('a')
+          a.href = url
+          a.download = file.name
+          a.click()
+          URL.revokeObjectURL(url)
+        }
+        setSharing(false)
+      }, 'image/png')
+    } catch {
+      setSharing(false)
+    }
+  }, [sharing, month, year])
 
   // Bar chart data
   const barData = {
@@ -171,10 +208,13 @@ export default function ReportsPage() {
           <ArrowLeft size={22} />
         </button>
         <h1 className="rpt-title">Relatórios</h1>
-        <div style={{ width: 40 }} />
+        <button className={`rpt-share-btn ${sharing ? 'sharing' : ''}`} onClick={handleShare} disabled={sharing} aria-label="Compartilhar">
+          <Share2 size={20} />
+        </button>
       </header>
 
-      {/* Month Selector */}
+      {/* Report Content (captured for share) */}
+      <div ref={reportRef}>
       <div className="rpt-month-selector glass">
         <button onClick={prevMonth} className="rpt-month-btn" aria-label="Mês anterior">
           <ChevronLeft size={18} />
@@ -324,6 +364,7 @@ export default function ReportsPage() {
           </div>
         </section>
       )}
+      </div> {/* end reportRef */}
     </div>
   )
 }

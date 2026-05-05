@@ -1,0 +1,294 @@
+/* ═══════════════════════════════
+   Credit Card Detail Page
+   ═══════════════════════════════ */
+
+.ccd-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-5);
+  padding-top: var(--space-2);
+}
+
+.ccd-back {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+.ccd-back:hover {
+  background: var(--primary-500);
+  color: white;
+  border-color: var(--primary-500);
+}
+
+.ccd-title {
+  font-size: var(--font-xl);
+  font-weight: var(--weight-bold);
+}
+
+/* Visual Card */
+.ccd-visual {
+  position: relative;
+  border-radius: var(--radius-xl);
+  padding: var(--space-5);
+  margin-bottom: var(--space-5);
+  overflow: hidden;
+  color: white;
+}
+
+.ccd-visual-bg {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, var(--cc-color, #6C5CE7), color-mix(in srgb, var(--cc-color, #6C5CE7) 60%, #000));
+  z-index: 0;
+}
+
+.ccd-visual-bg::after {
+  content: '';
+  position: absolute;
+  top: -40%;
+  right: -20%;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.ccd-visual-content {
+  position: relative;
+  z-index: 1;
+}
+
+.ccd-visual-top {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-5);
+  opacity: 0.9;
+}
+
+.ccd-visual-name {
+  font-size: var(--font-md);
+  font-weight: var(--weight-semibold);
+}
+
+.ccd-visual-label {
+  display: block;
+  font-size: var(--font-xs);
+  opacity: 0.7;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: var(--space-1);
+}
+
+.ccd-visual-value {
+  display: block;
+  font-size: var(--font-2xl);
+  font-weight: var(--weight-bold);
+  margin-bottom: var(--space-3);
+}
+
+.ccd-progress-bar {
+  width: 100%;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-full);
+  margin-bottom: var(--space-2);
+  overflow: hidden;
+}
+
+.ccd-progress-fill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.8);
+  transition: width 0.5s ease;
+}
+.ccd-progress-fill.danger {
+  background: #FF6B6B;
+}
+
+.ccd-visual-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--font-xs);
+  opacity: 0.7;
+}
+
+/* Info Cards */
+.ccd-info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+  margin-bottom: var(--space-6);
+}
+
+.ccd-info-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-md);
+  color: var(--text-tertiary);
+}
+
+.ccd-info-card div {
+  display: flex;
+  flex-direction: column;
+}
+
+.ccd-info-label {
+  font-size: 10px;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.ccd-info-value {
+  font-size: var(--font-sm);
+  font-weight: var(--weight-bold);
+  color: var(--text-primary);
+}
+
+/* Invoice Header */
+.ccd-invoice-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-3);
+}
+
+.ccd-month-nav {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  background: var(--bg-tertiary);
+  padding: var(--space-1);
+  border-radius: var(--radius-full);
+}
+
+.ccd-month-btn {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-secondary);
+  border-radius: 50%;
+  transition: all var(--transition-fast);
+}
+.ccd-month-btn:hover {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.ccd-month-label {
+  font-size: var(--font-sm);
+  font-weight: var(--weight-medium);
+  min-width: 80px;
+  text-align: center;
+}
+
+/* Invoice Total */
+.ccd-invoice-total {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-4);
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-lg);
+  margin-bottom: var(--space-4);
+}
+
+.ccd-invoice-total-label {
+  font-size: var(--font-sm);
+  color: var(--text-secondary);
+  font-weight: var(--weight-medium);
+}
+
+.ccd-invoice-total-value {
+  font-size: var(--font-xl);
+  font-weight: var(--weight-bold);
+  color: var(--danger-500);
+}
+
+/* Transaction List */
+.ccd-tx-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-bottom: var(--space-6);
+}
+
+.ccd-tx-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-md);
+}
+
+.ccd-tx-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.ccd-tx-desc {
+  display: block;
+  font-size: var(--font-sm);
+  font-weight: var(--weight-medium);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ccd-tx-date {
+  display: block;
+  font-size: var(--font-xs);
+  color: var(--text-tertiary);
+}
+
+.ccd-tx-amount {
+  font-size: var(--font-sm);
+  font-weight: var(--weight-bold);
+  color: var(--danger-500);
+  white-space: nowrap;
+}
+
+/* Delete Button */
+.ccd-delete-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  width: 100%;
+  padding: var(--space-3);
+  background: transparent;
+  border: 1.5px solid var(--danger-500);
+  border-radius: var(--radius-md);
+  color: var(--danger-500);
+  font-size: var(--font-sm);
+  font-weight: var(--weight-semibold);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  margin-bottom: var(--space-6);
+}
+.ccd-delete-btn:hover {
+  background: var(--danger-500);
+  color: white;
+}

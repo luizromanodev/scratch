@@ -14,6 +14,8 @@ import BudgetsPage from './pages/BudgetsPage'
 import GoalsPage from './pages/GoalsPage'
 import ReportsPage from './pages/ReportsPage'
 import CategoriesPage from './pages/CategoriesPage'
+import AccountsPage from './pages/AccountsPage'
+import CreditCardDetailPage from './pages/CreditCardDetailPage'
 
 function ProtectedRoutes() {
   const { isAuthenticated } = useAuth()
@@ -32,6 +34,8 @@ function ProtectedRoutes() {
           <Route path="/goals" element={<GoalsPage />} />
           <Route path="/reports" element={<ReportsPage />} />
           <Route path="/categories" element={<CategoriesPage />} />
+          <Route path="/accounts" element={<AccountsPage />} />
+          <Route path="/card/:id" element={<CreditCardDetailPage />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
