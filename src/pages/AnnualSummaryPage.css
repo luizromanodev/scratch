@@ -1,0 +1,39 @@
+/* AnnualSummaryPage */
+.ann-header { display: flex; align-items: center; gap: var(--space-3); margin-bottom: var(--space-5); }
+.ann-title { font-size: var(--font-xl); font-weight: var(--weight-bold); }
+
+.ann-year-sel { display: flex; align-items: center; justify-content: center; gap: var(--space-4); padding: var(--space-3); border-radius: var(--radius-md); margin-bottom: var(--space-4); border: 1px solid var(--card-border); }
+.ann-year-sel button { background: none; border: none; color: var(--text-secondary); cursor: pointer; padding: 4px; border-radius: var(--radius-full); transition: all var(--transition-fast); }
+.ann-year-sel button:hover { background: var(--bg-tertiary); color: var(--primary-500); }
+.ann-year-label { font-size: var(--font-lg); font-weight: var(--weight-bold); }
+
+.ann-kpi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); margin-bottom: var(--space-4); }
+.ann-kpi { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3) var(--space-4); border-radius: var(--radius-lg); background: var(--card-bg); border: 1px solid var(--card-border); }
+.ann-kpi.income svg { color: var(--success-500); }
+.ann-kpi.expense svg { color: var(--danger-500); }
+.ann-kpi.balance svg { color: var(--primary-500); }
+.ann-kpi.best svg { color: #FDCB6E; }
+.ann-kpi-label { display: block; font-size: var(--font-xs); color: var(--text-tertiary); }
+.ann-kpi-value { display: block; font-size: var(--font-sm); font-weight: var(--weight-bold); }
+.ann-kpi-value.positive { color: var(--success-500); }
+.ann-kpi-value.negative { color: var(--danger-500); }
+
+.ann-chart-section { padding: var(--space-4); border-radius: var(--radius-xl); margin-bottom: var(--space-5); border: 1px solid var(--card-border); }
+.ann-chart-title { font-size: var(--font-base); font-weight: var(--weight-semibold); margin-bottom: var(--space-3); }
+.ann-chart-wrapper { height: 200px; }
+.ann-chart-legend { display: flex; justify-content: center; gap: var(--space-4); margin-top: var(--space-3); }
+.ann-legend { display: flex; align-items: center; gap: var(--space-1); font-size: var(--font-xs); color: var(--text-secondary); }
+.ann-dot { width: 8px; height: 8px; border-radius: 50%; }
+.ann-dot.income { background: var(--success-500); }
+.ann-dot.expense { background: var(--danger-500); }
+
+.ann-table-section { margin-bottom: var(--space-6); }
+.ann-table { border-radius: var(--radius-lg); overflow: hidden; border: 1px solid var(--card-border); }
+.ann-table-header { display: grid; grid-template-columns: 1fr 1.2fr 1.2fr 1.2fr; padding: var(--space-3); background: var(--bg-tertiary); font-size: var(--font-xs); font-weight: var(--weight-semibold); color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.5px; }
+.ann-table-row { display: grid; grid-template-columns: 1fr 1.2fr 1.2fr 1.2fr; padding: var(--space-3); font-size: var(--font-sm); border-top: 1px solid var(--border-color); transition: background var(--transition-fast); }
+.ann-table-row:hover { background: var(--bg-tertiary); }
+.ann-month-name { font-weight: var(--weight-medium); }
+.ann-income { color: var(--success-500); }
+.ann-expense { color: var(--danger-500); }
+.ann-balance.positive { color: var(--success-500); font-weight: var(--weight-semibold); }
+.ann-balance.negative { color: var(--danger-500); font-weight: var(--weight-semibold); }

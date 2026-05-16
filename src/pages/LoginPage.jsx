@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useAuth } from '../context/AuthContext'
-import { Wallet, ArrowRight, Eye, EyeOff } from 'lucide-react'
+import { Wallet, ArrowRight } from 'lucide-react'
 import './LoginPage.css'
 
 export default function LoginPage() {
@@ -8,12 +8,15 @@ export default function LoginPage() {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [step, setStep] = useState(0) // 0=splash, 1=form
+  const [nameError, setNameError] = useState(false)
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    if (name.trim()) {
-      login(name.trim(), email.trim())
+    if (!name.trim()) {
+      setNameError(true)
+      return
     }
+    login(name.trim(), email.trim())
   }
 
   if (step === 0) {
@@ -78,10 +81,12 @@ export default function LoginPage() {
               type="text"
               placeholder="Como podemos te chamar?"
               value={name}
-              onChange={e => setName(e.target.value)}
+              onChange={e => { setName(e.target.value); setNameError(false) }}
               autoFocus
               required
+              style={nameError ? { borderColor: 'var(--danger-500)', boxShadow: '0 0 0 3px rgba(255,107,107,0.15)' } : {}}
             />
+            {nameError && <span style={{ color: 'var(--danger-500)', fontSize: 'var(--font-xs)', marginTop: '4px' }}>Por favor, digite seu nome</span>}
           </div>
           <div className="form-group">
             <label htmlFor="login-email">E-mail (opcional)</label>

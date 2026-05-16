@@ -1,0 +1,67 @@
+/* Quick Transactions */
+.quick-tx-section { margin-bottom: var(--space-4); }
+
+.quick-tx-header {
+  display: flex; align-items: center;
+  gap: var(--space-2); margin-bottom: var(--space-3);
+}
+
+.quick-tx-icon { color: #FDCB6E; }
+
+.quick-tx-scroll {
+  display: flex;
+  gap: var(--space-2);
+  overflow-x: auto;
+  padding-bottom: var(--space-2);
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+}
+
+.quick-tx-scroll::-webkit-scrollbar { display: none; }
+
+.quick-tx-chip {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-full);
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  cursor: pointer;
+  white-space: nowrap;
+  scroll-snap-align: start;
+  transition: all var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.quick-tx-chip:hover {
+  border-color: var(--primary-400);
+  box-shadow: var(--shadow-sm);
+  transform: translateY(-1px);
+}
+
+.quick-tx-chip-icon {
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+
+.quick-tx-chip-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.quick-tx-chip-name {
+  font-size: 11px;
+  font-weight: var(--weight-medium);
+  color: var(--text-primary);
+}
+
+.quick-tx-chip-amount {
+  font-size: 10px;
+  font-weight: var(--weight-semibold);
+}
+
+.quick-tx-chip-amount.income { color: var(--success-500); }
+.quick-tx-chip-amount.expense { color: var(--danger-500); }

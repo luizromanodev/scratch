@@ -10,21 +10,31 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js'
 import {
   TrendingUp, TrendingDown, Eye, EyeOff, ChevronLeft, ChevronRight,
   Plus, Minus, ArrowRight, PieChart, Target, BarChart3, Search, Settings,
-  Wallet, PiggyBank, Banknote, ArrowRightLeft, CreditCard, X
+  Wallet, PiggyBank, Banknote, ArrowRightLeft, CreditCard, X,
+  Repeat, Calendar, Trophy, Sparkles, Bitcoin
 } from 'lucide-react'
 import './DashboardPage.css'
 import Onboarding from '../components/UI/Onboarding'
 import GlobalSearch from '../components/UI/GlobalSearch'
 import BudgetAlerts from '../components/UI/BudgetAlerts'
+import NotificationCenter from '../components/UI/NotificationCenter'
+import SpendingInsights from '../components/UI/SpendingInsights'
+import HealthScore from '../components/UI/HealthScore'
+import TransactionDetail from '../components/UI/TransactionDetail'
+import QuickTransactions from '../components/UI/QuickTransactions'
+import MonthComparison from '../components/UI/MonthComparison'
+import DailyTip from '../components/UI/DailyTip'
+
 
 ChartJS.register(ArcElement, Tooltip, Legend)
 
 export default function DashboardPage() {
   const { user } = useAuth()
-  const { currency, categories, accounts, tags, creditCards, getBalance, getTransactionsByMonth, getExpensesByCategory, getAccountBalance } = useFinance()
+  const { currency, categories, accounts, tags, creditCards, getBalance, getTransactionsByMonth, getExpensesByCategory, getAccountBalance, deleteTransaction } = useFinance()
   const navigate = useNavigate()
 
   const [showBalance, setShowBalance] = useState(true)
+  const [selectedTx, setSelectedTx] = useState(null)
   const [month, setMonth] = useState(getCurrentMonth())
   const [year, setYear] = useState(getCurrentYear())
   const [showOnboarding, setShowOnboarding] = useState(
@@ -37,8 +47,8 @@ export default function DashboardPage() {
   const [widgets, setWidgets] = useState(() => {
     try {
       const saved = localStorage.getItem('finflow_widgets')
-      return saved ? JSON.parse(saved) : { planning: true, chart: true, transactions: true }
-    } catch { return { planning: true, chart: true, transactions: true } }
+      return saved ? JSON.parse(saved) : { planning: true, chart: true, transactions: true, health: true, insights: true, comparison: true }
+    } catch { return { planning: true, chart: true, transactions: true, health: true, insights: true, comparison: true } }
   })
 
   const toggleWidget = (key) => {
@@ -52,6 +62,8 @@ export default function DashboardPage() {
   const balance = useMemo(() => getBalance(month, year), [month, year, getBalance])
   const transactions = useMemo(() => getTransactionsByMonth(month, year).slice(0, 5), [month, year, getTransactionsByMonth])
   const expensesByCategory = useMemo(() => getExpensesByCategory(month, year), [month, year, getExpensesByCategory])
+
+
 
   const firstName = user?.name?.split(' ')[0] || 'Usuário'
 
@@ -117,20 +129,21 @@ export default function DashboardPage() {
           <button className="dash-search-btn" onClick={() => setShowSearch(true)} aria-label="Buscar">
             <Search size={20} />
           </button>
+          <NotificationCenter />
           <button className="dash-search-btn" onClick={() => setShowWidgetSettings(s => !s)} aria-label="Widgets">
             <Settings size={18} />
           </button>
-          <div className="dash-month-selector">
-            <button onClick={prevMonth} className="dash-month-btn" aria-label="Mês anterior">
-              <ChevronLeft size={18} />
-            </button>
-            <span className="dash-month-label">{getMonthName(month)} {year}</span>
-            <button onClick={nextMonth} className="dash-month-btn" aria-label="Próximo mês">
-              <ChevronRight size={18} />
-            </button>
-          </div>
         </div>
       </header>
+      <div className="dash-month-selector">
+        <button onClick={prevMonth} className="dash-month-btn" aria-label="Mês anterior">
+          <ChevronLeft size={18} />
+        </button>
+        <span className="dash-month-label">{getMonthName(month)} {year}</span>
+        <button onClick={nextMonth} className="dash-month-btn" aria-label="Próximo mês">
+          <ChevronRight size={18} />
+        </button>
+      </div>
 
       {/* Balance Card */}
       <section className="balance-card" id="balance-card">
@@ -191,6 +204,15 @@ export default function DashboardPage() {
       {/* Budget Alerts */}
       <BudgetAlerts />
 
+      {/* Daily Tip */}
+      <DailyTip />
+
+      {/* Spending Insights */}
+      {(widgets.insights !== false) && <SpendingInsights month={month} year={year} />}
+
+      {/* Quick Transaction Shortcuts */}
+      <QuickTransactions />
+
       {/* Widget Settings Popup */}
       {showWidgetSettings && (
         <>
@@ -202,6 +224,9 @@ export default function DashboardPage() {
           </div>
           {[
             { key: 'planning', label: 'Planejamento', desc: 'Orçamentos, metas, relatórios' },
+            { key: 'health', label: 'Saúde Financeira', desc: 'Score de saúde' },
+            { key: 'insights', label: 'Insights', desc: 'Dicas inteligentes' },
+            { key: 'comparison', label: 'Comparativo', desc: 'Mês anterior vs atual' },
             { key: 'chart', label: 'Gráfico de categorias', desc: 'Distribuição de gastos' },
             { key: 'transactions', label: 'Últimas transações', desc: 'Transações recentes' },
           ].map(w => (
@@ -243,6 +268,41 @@ export default function DashboardPage() {
              <div className="planning-info">
                <h3>Relatórios</h3>
                <p>Insights financeiros</p>
+             </div>
+          </button>
+          <button className="planning-card glass" onClick={() => navigate('/recurring')}>
+             <div className="planning-icon" style={{ background: 'rgba(116,185,255,0.12)', color: '#74B9FF' }}><Repeat size={22}/></div>
+             <div className="planning-info">
+               <h3>Recorrentes</h3>
+               <p>Contas fixas</p>
+             </div>
+          </button>
+          <button className="planning-card glass" onClick={() => navigate('/annual')}>
+             <div className="planning-icon" style={{ background: 'rgba(253,203,110,0.12)', color: '#FDCB6E' }}><Calendar size={22}/></div>
+             <div className="planning-info">
+               <h3>Resumo Anual</h3>
+               <p>Visão do ano</p>
+             </div>
+          </button>
+          <button className="planning-card glass" onClick={() => navigate('/achievements')}>
+             <div className="planning-icon" style={{ background: 'rgba(225,112,85,0.12)', color: '#E17055' }}><Trophy size={22}/></div>
+             <div className="planning-info">
+               <h3>Conquistas</h3>
+               <p>Desbloqueie badges</p>
+             </div>
+          </button>
+          <button className="planning-card glass" onClick={() => navigate('/ai')}>
+             <div className="planning-icon" style={{ background: 'linear-gradient(135deg, rgba(108,92,231,0.15), rgba(162,155,254,0.15))', color: '#A29BFE' }}><Sparkles size={22}/></div>
+             <div className="planning-info">
+               <h3>FinBot IA</h3>
+               <p>Assistente inteligente</p>
+             </div>
+          </button>
+          <button className="planning-card glass" onClick={() => navigate('/crypto')}>
+             <div className="planning-icon" style={{ background: 'linear-gradient(135deg, rgba(247,147,26,0.15), rgba(255,193,7,0.15))', color: '#F7931A' }}><Bitcoin size={22}/></div>
+             <div className="planning-info">
+               <h3>Criptomoedas</h3>
+               <p>Cotações em tempo real</p>
              </div>
           </button>
         </div>
@@ -311,6 +371,17 @@ export default function DashboardPage() {
         </section>
       )}
 
+      {/* Financial Health Score */}
+      {(widgets.health !== false) && (
+      <section className="dash-section animate-fade-in-up">
+        <h2 className="section-title">Saúde Financeira</h2>
+        <HealthScore month={month} year={year} />
+      </section>
+      )}
+
+      {/* Month Comparison */}
+      {(widgets.comparison !== false) && <MonthComparison month={month} year={year} />}
+
       {/* Chart */}
       {widgets.chart && expensesByCategory.length > 0 && (
         <section className="dash-section animate-fade-in-up">
@@ -363,7 +434,7 @@ export default function DashboardPage() {
             {transactions.map(tx => {
               const cat = getCategoryById(categories, tx.category)
               return (
-                <div key={tx.id} className="transaction-item" id={`tx-${tx.id}`}>
+                <div key={tx.id} className="transaction-item" id={`tx-${tx.id}`} onClick={() => setSelectedTx(tx)} style={{ cursor: 'pointer' }}>
                   <div className="tx-icon" style={{ background: cat?.color + '18', color: cat?.color }}>
                     <CategoryIcon iconName={cat?.icon} size={18} color={cat?.color} />
                   </div>
@@ -392,6 +463,10 @@ export default function DashboardPage() {
       </section>
       )}
     </div>
-    </>
-  )
+    {/* Floating AI Button */}
+    <button className="dash-ai-fab" onClick={() => navigate('/ai')} aria-label="FinBot IA">
+      <Sparkles size={20} />
+    </button>
+    <TransactionDetail transaction={selectedTx} onClose={() => setSelectedTx(null)} onDelete={(id) => deleteTransaction(id)} />
+    </>  )
 }

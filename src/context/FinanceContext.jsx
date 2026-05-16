@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react'
 import { defaultCategories } from '../utils/categories'
+import { notifyTransaction, runNotificationChecks } from '../utils/notificationManager'
 
 const FinanceContext = createContext()
 
@@ -86,6 +87,12 @@ export function FinanceProvider({ children }) {
       ...prev,
       transactions: [...newTxs, ...prev.transactions]
     }))
+
+    // Fire push notification for the transaction
+    try {
+      notifyTransaction(newTxs[0])
+    } catch { /* silent */ }
+
     return newTxs[0]
   }, [])
 
@@ -357,6 +364,22 @@ export function FinanceProvider({ children }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  // Run periodic notification checks
+  useEffect(() => {
+    try {
+      runNotificationChecks(data)
+    } catch { /* silent */ }
+
+    // Also listen for SW messages requesting checks
+    const handleSWMessage = (event) => {
+      if (event.data?.type === 'CHECK_NOTIFICATIONS') {
+        try { runNotificationChecks(data) } catch { /* silent */ }
+      }
+    }
+    navigator.serviceWorker?.addEventListener('message', handleSWMessage)
+    return () => navigator.serviceWorker?.removeEventListener('message', handleSWMessage)
+  }, [data.transactions.length, data.budgets, data.creditCards, data.goals]) // eslint-disable-line react-hooks/exhaustive-deps
+
   // ── Computed values ──
   const getBalance = useCallback((month, year, accountId) => {
     let txs = data.transactions
@@ -440,6 +463,149 @@ export function FinanceProvider({ children }) {
     })
   }, [])
 
+  // ── Achievements / Gamification ──
+  const achievements = useMemo(() => {
+    const list = []
+    const txCount = data.transactions.length
+    const goalsDone = (data.goals || []).filter(g => (g.currentAmount || 0) >= g.targetAmount).length
+    const budgetCount = (data.budgets || []).length
+    const catCount = (data.categories || []).filter(c => c.id.startsWith('custom_')).length
+    const accountCount = (data.accounts || []).length
+    const tagCount = (data.tags || []).length
+    const cardCount = (data.creditCards || []).length
+
+    // Transaction milestones
+    if (txCount >= 1) list.push({ id: 'first_tx', icon: '🎯', name: 'Primeira Transação', desc: 'Registrou sua primeira transação', unlocked: true })
+    else list.push({ id: 'first_tx', icon: '🎯', name: 'Primeira Transação', desc: 'Registre sua primeira transação', unlocked: false })
+
+    if (txCount >= 10) list.push({ id: 'tx_10', icon: '📝', name: 'Organizando as Finanças', desc: 'Registrou 10 transações', unlocked: true })
+    else list.push({ id: 'tx_10', icon: '📝', name: 'Organizando as Finanças', desc: `${txCount}/10 transações`, unlocked: false, progress: txCount / 10 })
+
+    if (txCount >= 50) list.push({ id: 'tx_50', icon: '📊', name: 'Controle Total', desc: 'Registrou 50 transações', unlocked: true })
+    else list.push({ id: 'tx_50', icon: '📊', name: 'Controle Total', desc: `${txCount}/50 transações`, unlocked: false, progress: txCount / 50 })
+
+    if (txCount >= 100) list.push({ id: 'tx_100', icon: '🏆', name: 'Centenário', desc: 'Registrou 100 transações', unlocked: true })
+    else list.push({ id: 'tx_100', icon: '🏆', name: 'Centenário', desc: `${txCount}/100 transações`, unlocked: false, progress: txCount / 100 })
+
+    // Budget
+    if (budgetCount >= 1) list.push({ id: 'first_budget', icon: '🎯', name: 'Planejador', desc: 'Criou seu primeiro orçamento', unlocked: true })
+    else list.push({ id: 'first_budget', icon: '🎯', name: 'Planejador', desc: 'Crie seu primeiro orçamento', unlocked: false })
+
+    // Goals
+    if (goalsDone >= 1) list.push({ id: 'first_goal', icon: '⭐', name: 'Sonho Realizado', desc: 'Completou sua primeira meta', unlocked: true })
+    else list.push({ id: 'first_goal', icon: '⭐', name: 'Sonho Realizado', desc: 'Complete sua primeira meta', unlocked: false })
+
+    // Categories
+    if (catCount >= 3) list.push({ id: 'custom_cats', icon: '🎨', name: 'Personalizado', desc: 'Criou 3 categorias customizadas', unlocked: true })
+    else list.push({ id: 'custom_cats', icon: '🎨', name: 'Personalizado', desc: `${catCount}/3 categorias criadas`, unlocked: false, progress: catCount / 3 })
+
+    // Accounts
+    if (accountCount >= 2) list.push({ id: 'multi_acc', icon: '🏦', name: 'Diversificado', desc: 'Tem 2+ contas financeiras', unlocked: true })
+    else list.push({ id: 'multi_acc', icon: '🏦', name: 'Diversificado', desc: 'Cadastre 2+ contas', unlocked: false })
+
+    // Tags
+    if (tagCount >= 3) list.push({ id: 'tagger', icon: '🏷️', name: 'Organizador', desc: 'Criou 3+ tags', unlocked: true })
+    else list.push({ id: 'tagger', icon: '🏷️', name: 'Organizador', desc: `${tagCount}/3 tags criadas`, unlocked: false, progress: tagCount / 3 })
+
+    // Cards
+    if (cardCount >= 1) list.push({ id: 'first_card', icon: '💳', name: 'Cartão na Mão', desc: 'Cadastrou seu primeiro cartão', unlocked: true })
+    else list.push({ id: 'first_card', icon: '💳', name: 'Cartão na Mão', desc: 'Cadastre um cartão de crédito', unlocked: false })
+
+    return list
+  }, [data.transactions, data.goals, data.budgets, data.categories, data.accounts, data.tags, data.creditCards])
+
+  // ── Smart Notifications ──
+  const getNotifications = useCallback(() => {
+    const notifs = []
+    const today = new Date()
+    const currentMonth = today.getMonth()
+    const currentYear = today.getFullYear()
+
+    // Budget alerts
+    ;(data.budgets || []).forEach(budget => {
+      const cat = (data.categories || []).find(c => c.id === budget.categoryId)
+      const expenses = data.transactions
+        .filter(t => {
+          const d = new Date(t.date + 'T00:00:00')
+          return t.type === 'expense' && t.category === budget.categoryId && d.getMonth() === currentMonth && d.getFullYear() === currentYear
+        })
+        .reduce((s, t) => s + t.amount, 0)
+      const pct = (expenses / budget.limit) * 100
+      if (pct >= 100) {
+        notifs.push({ id: `bgt_${budget.id}`, type: 'danger', icon: '🚨', title: `${cat?.name || 'Categoria'} estourou!`, desc: `Orçamento ultrapassado em ${Math.round(pct - 100)}%`, time: 'Agora' })
+      } else if (pct >= 80) {
+        notifs.push({ id: `bgt_${budget.id}`, type: 'warning', icon: '⚠️', title: `${cat?.name || 'Categoria'} quase no limite`, desc: `${Math.round(pct)}% do orçamento usado`, time: 'Agora' })
+      }
+    })
+
+    // Goals almost done
+    ;(data.goals || []).forEach(goal => {
+      const pct = ((goal.currentAmount || 0) / goal.targetAmount) * 100
+      if (pct >= 90 && pct < 100) {
+        notifs.push({ id: `goal_${goal.id}`, type: 'success', icon: '🎯', title: `${goal.name} quase lá!`, desc: `${Math.round(pct)}% da meta alcançada`, time: 'Agora' })
+      } else if (pct >= 100) {
+        notifs.push({ id: `goal_done_${goal.id}`, type: 'success', icon: '🎉', title: `${goal.name} concluída!`, desc: 'Parabéns! Meta alcançada', time: 'Agora' })
+      }
+    })
+
+    // Credit card due dates
+    ;(data.creditCards || []).forEach(card => {
+      if (card.dueDay) {
+        const dueDate = new Date(currentYear, currentMonth, card.dueDay)
+        const daysUntilDue = Math.ceil((dueDate - today) / (1000 * 60 * 60 * 24))
+        if (daysUntilDue >= 0 && daysUntilDue <= 5) {
+          notifs.push({ id: `card_${card.id}`, type: 'warning', icon: '💳', title: `Fatura ${card.name}`, desc: daysUntilDue === 0 ? 'Vence hoje!' : `Vence em ${daysUntilDue} dia(s)`, time: `${daysUntilDue}d` })
+        }
+      }
+    })
+
+    // Recurring transactions reminder
+    const recurringTxs = data.transactions.filter(t => t.isRecurring && !t._generatedFrom)
+    recurringTxs.forEach(tx => {
+      const txDate = new Date(tx.date + 'T00:00:00')
+      const nextDate = new Date(currentYear, currentMonth, txDate.getDate())
+      const daysUntil = Math.ceil((nextDate - today) / (1000 * 60 * 60 * 24))
+      if (daysUntil >= 0 && daysUntil <= 3) {
+        notifs.push({ id: `rec_${tx.id}`, type: 'info', icon: '🔄', title: tx.description || 'Conta recorrente', desc: daysUntil === 0 ? 'Vence hoje' : `Vence em ${daysUntil} dia(s)`, time: `${daysUntil}d` })
+      }
+    })
+
+    return notifs
+  }, [data.budgets, data.categories, data.transactions, data.goals, data.creditCards])
+
+  // ── Recurring Transactions Management ──
+  const getRecurringTransactions = useCallback(() => {
+    return data.transactions.filter(t => t.isRecurring && !t._generatedFrom)
+  }, [data.transactions])
+
+  const toggleRecurring = useCallback((id) => {
+    setData(prev => ({
+      ...prev,
+      transactions: prev.transactions.map(t =>
+        t.id === id ? { ...t, isRecurringPaused: !t.isRecurringPaused } : t
+      )
+    }))
+  }, [])
+
+  // ── Annual Summary ──
+  const getAnnualSummary = useCallback((year) => {
+    const months = []
+    for (let m = 0; m < 12; m++) {
+      const txs = data.transactions.filter(t => {
+        const d = new Date(t.date + 'T00:00:00')
+        return d.getMonth() === m && d.getFullYear() === year
+      })
+      const income = txs.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0)
+      const expense = txs.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0)
+      months.push({ month: m, income, expense, balance: income - expense })
+    }
+    const totalIncome = months.reduce((s, m) => s + m.income, 0)
+    const totalExpense = months.reduce((s, m) => s + m.expense, 0)
+    const bestMonth = months.reduce((best, m) => m.balance > best.balance ? m : best, months[0])
+    const worstMonth = months.reduce((worst, m) => m.balance < worst.balance ? m : worst, months[0])
+    return { months, totalIncome, totalExpense, totalBalance: totalIncome - totalExpense, bestMonth, worstMonth }
+  }, [data.transactions])
+
   const clearAllData = useCallback(() => {
     setData({
       transactions: [],
@@ -478,6 +644,11 @@ export function FinanceProvider({ children }) {
     getCardInvoice, processRecurring,
     exportData, importData,
     clearAllData,
+    // Phase 5
+    achievements,
+    getNotifications,
+    getRecurringTransactions, toggleRecurring,
+    getAnnualSummary,
   }
 
   return (

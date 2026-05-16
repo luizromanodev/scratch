@@ -1,0 +1,91 @@
+/* ═══════════════════════════════
+   Financial Health Score
+   ═══════════════════════════════ */
+
+.health-widget {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-xl);
+}
+
+.health-ring-container {
+  position: relative;
+  width: 96px; height: 96px;
+  flex-shrink: 0;
+}
+
+.health-ring {
+  width: 100%; height: 100%;
+  transform: rotate(-90deg);
+}
+
+.health-ring-bg {
+  fill: none;
+  stroke: var(--bg-tertiary);
+  stroke-width: 8;
+}
+
+.health-ring-fill {
+  fill: none;
+  stroke-width: 8;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 1s ease-out, stroke 0.5s ease;
+}
+
+.health-ring-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.health-score {
+  font-size: var(--font-xl);
+  font-weight: var(--weight-extrabold);
+  line-height: 1;
+}
+
+.health-label {
+  font-size: 10px;
+  color: var(--text-tertiary);
+  font-weight: var(--weight-medium);
+  margin-top: 2px;
+}
+
+.health-factors {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.health-factor {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-xs);
+}
+
+.health-factor-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.health-factor-dot.good { background: var(--success-500); }
+.health-factor-dot.bad { background: var(--danger-500); }
+
+.health-factor-name {
+  flex: 1;
+  color: var(--text-secondary);
+}
+
+.health-factor-value {
+  font-weight: var(--weight-semibold);
+  color: var(--text-primary);
+}

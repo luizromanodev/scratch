@@ -16,6 +16,14 @@ import ReportsPage from './pages/ReportsPage'
 import CategoriesPage from './pages/CategoriesPage'
 import AccountsPage from './pages/AccountsPage'
 import CreditCardDetailPage from './pages/CreditCardDetailPage'
+import AchievementsPage from './pages/AchievementsPage'
+import RecurringPage from './pages/RecurringPage'
+import AnnualSummaryPage from './pages/AnnualSummaryPage'
+import NotificationsPage from './pages/NotificationsPage'
+import AIAssistantPage from './pages/AIAssistantPage'
+import CryptoPage from './pages/CryptoPage'
+
+import NotFoundPage from './pages/NotFoundPage'
 
 function ProtectedRoutes() {
   const { isAuthenticated } = useAuth()
@@ -36,8 +44,14 @@ function ProtectedRoutes() {
           <Route path="/categories" element={<CategoriesPage />} />
           <Route path="/accounts" element={<AccountsPage />} />
           <Route path="/card/:id" element={<CreditCardDetailPage />} />
+          <Route path="/achievements" element={<AchievementsPage />} />
+          <Route path="/recurring" element={<RecurringPage />} />
+          <Route path="/annual" element={<AnnualSummaryPage />} />
+          <Route path="/notifications" element={<NotificationsPage />} />
+          <Route path="/ai" element={<AIAssistantPage />} />
+          <Route path="/crypto" element={<CryptoPage />} />
         </Route>
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </FinanceProvider>
   )
@@ -56,16 +70,20 @@ function AppRoutes() {
   )
 }
 
+import ErrorBoundary from './components/ErrorBoundary'
+
 export default function App() {
   return (
-    <BrowserRouter>
-      <ThemeProvider>
-        <AuthProvider>
-          <ToastProvider>
-            <AppRoutes />
-          </ToastProvider>
-        </AuthProvider>
-      </ThemeProvider>
-    </BrowserRouter>
+    <ErrorBoundary>
+      <BrowserRouter>
+        <ThemeProvider>
+          <AuthProvider>
+            <ToastProvider>
+              <AppRoutes />
+            </ToastProvider>
+          </AuthProvider>
+        </ThemeProvider>
+      </BrowserRouter>
+    </ErrorBoundary>
   )
 }

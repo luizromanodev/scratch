@@ -1,0 +1,324 @@
+/* ── Notifications Page ── */
+
+.notif-page-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+  padding-top: var(--safe-top, 0);
+}
+
+.notif-page-title {
+  font-size: var(--font-xl);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.notif-page-subtitle {
+  font-size: var(--font-sm);
+  color: var(--text-tertiary);
+  margin: 0;
+}
+
+/* ── Permission Banner ── */
+.notif-banner {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  padding: 16px;
+  border-radius: 16px;
+  margin-bottom: 16px;
+  animation: fadeInUp 0.4s ease;
+}
+
+.notif-banner strong {
+  display: block;
+  font-size: var(--font-sm);
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.notif-banner p {
+  font-size: var(--font-xs);
+  opacity: 0.8;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.notif-banner-success {
+  background: linear-gradient(135deg, rgba(0, 184, 148, 0.12), rgba(0, 184, 148, 0.06));
+  border: 1px solid rgba(0, 184, 148, 0.2);
+  color: #00B894;
+}
+
+.notif-banner-error {
+  background: linear-gradient(135deg, rgba(255, 107, 107, 0.12), rgba(255, 107, 107, 0.06));
+  border: 1px solid rgba(255, 107, 107, 0.2);
+  color: #FF6B6B;
+}
+
+.notif-banner-info {
+  background: linear-gradient(135deg, rgba(108, 92, 231, 0.12), rgba(108, 92, 231, 0.06));
+  border: 1px solid rgba(108, 92, 231, 0.2);
+  color: var(--primary-500);
+}
+
+/* ── Main Enable Toggle ── */
+.notif-main-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 16px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
+  margin-bottom: 20px;
+}
+
+.notif-main-toggle-info {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  color: var(--text-primary);
+}
+
+.notif-main-label {
+  display: block;
+  font-size: var(--font-base);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.notif-main-desc {
+  display: block;
+  font-size: var(--font-xs);
+  color: var(--text-tertiary);
+  margin-top: 2px;
+}
+
+/* ── Settings Body ── */
+.notif-settings-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ── Section ── */
+.notif-section {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.notif-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 14px 16px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-primary);
+  font-size: var(--font-sm);
+  font-weight: 600;
+  font-family: inherit;
+  transition: background 0.2s;
+}
+
+.notif-section-header:active {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.notif-section-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.notif-section-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.notif-section-content {
+  border-top: 1px solid var(--card-border);
+  padding: 4px 0;
+  animation: fadeInUp 0.25s ease;
+}
+
+/* ── Setting Row ── */
+.notif-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  gap: 12px;
+}
+
+.notif-row-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.notif-row-label {
+  display: block;
+  font-size: var(--font-sm);
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.notif-row-desc {
+  display: block;
+  font-size: 11px;
+  color: var(--text-tertiary);
+  margin-top: 2px;
+}
+
+/* ── Select ── */
+.notif-select {
+  padding: 8px 12px;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 1px solid var(--card-border);
+  border-radius: 10px;
+  font-size: var(--font-xs);
+  font-family: inherit;
+  cursor: pointer;
+  min-width: 110px;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%23888' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right: 28px;
+}
+
+.notif-select:focus {
+  border-color: var(--primary-500);
+}
+
+/* ── Quiet Hours ── */
+.notif-quiet-hours {
+  flex-direction: row;
+  gap: 16px;
+}
+
+.notif-quiet-time {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.notif-quiet-time label {
+  font-size: var(--font-xs);
+  color: var(--text-tertiary);
+  font-weight: 500;
+}
+
+/* ── Test Button ── */
+.notif-test-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(135deg, var(--primary-500), var(--primary-600, #5A4BD1));
+  color: #fff;
+  border: none;
+  border-radius: 14px;
+  font-size: var(--font-sm);
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 15px rgba(108, 92, 231, 0.3);
+  margin-top: 4px;
+}
+
+.notif-test-btn:active {
+  transform: scale(0.97);
+}
+
+/* ── Install Hint ── */
+.notif-install-hint {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  padding: 16px;
+  background: linear-gradient(135deg, rgba(116, 185, 255, 0.08), rgba(116, 185, 255, 0.03));
+  border: 1px solid rgba(116, 185, 255, 0.15);
+  border-radius: 16px;
+  color: #74B9FF;
+  margin-bottom: 40px;
+}
+
+.notif-install-hint strong {
+  display: block;
+  font-size: var(--font-sm);
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.notif-install-hint p {
+  font-size: var(--font-xs);
+  opacity: 0.8;
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* ── Toggle Switch (reuse existing or define if needed) ── */
+.toggle-switch {
+  width: 48px;
+  height: 28px;
+  border-radius: 14px;
+  background: var(--bg-secondary);
+  border: 2px solid var(--card-border);
+  cursor: pointer;
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  flex-shrink: 0;
+  padding: 0;
+}
+
+.toggle-switch.on {
+  background: var(--primary-500);
+  border-color: var(--primary-500);
+}
+
+.toggle-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--text-secondary);
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.toggle-switch.on .toggle-thumb {
+  transform: translateX(20px);
+  background: #fff;
+}
+
+/* ── Animations ── */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

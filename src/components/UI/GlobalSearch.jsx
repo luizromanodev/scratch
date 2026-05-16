@@ -1,4 +1,5 @@
 import { useState, useMemo, useRef, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { useNavigate } from 'react-router-dom'
 import { useFinance } from '../../context/FinanceContext'
 import { formatCurrency } from '../../utils/formatCurrency'
@@ -92,6 +93,17 @@ export default function GlobalSearch({ isOpen, onClose }) {
     return all.length > 0 ? all : []
   }, [query, transactions, categories, goals, creditCards, currency, navigate])
 
+  // Group results by type
+  const grouped = useMemo(() => {
+    if (!results) return []
+    const groups = {}
+    results.forEach(r => {
+      if (!groups[r.type]) groups[r.type] = []
+      groups[r.type].push(r)
+    })
+    return Object.entries(groups)
+  }, [results])
+
   if (!isOpen) return null
 
   const getResultIcon = (result) => {
@@ -121,18 +133,7 @@ export default function GlobalSearch({ isOpen, onClose }) {
 
   const typeLabels = { transaction: 'Transações', category: 'Categorias', goal: 'Metas', card: 'Cartões' }
 
-  // Group results by type
-  const grouped = useMemo(() => {
-    if (!results) return []
-    const groups = {}
-    results.forEach(r => {
-      if (!groups[r.type]) groups[r.type] = []
-      groups[r.type].push(r)
-    })
-    return Object.entries(groups)
-  }, [results])
-
-  return (
+  return createPortal(
     <div className="gs-overlay" onClick={onClose}>
       <div className="gs-container animate-fade-in-down" onClick={e => e.stopPropagation()}>
         {/* Search Input */}
@@ -201,6 +202,7 @@ export default function GlobalSearch({ isOpen, onClose }) {
           )}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }

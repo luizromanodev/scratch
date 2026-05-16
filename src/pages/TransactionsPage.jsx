@@ -9,6 +9,7 @@ import { parseImportFile } from '../utils/importUtils'
 import { Search, SlidersHorizontal, Trash2, X, FileUp, Pencil, ChevronDown, Tag } from 'lucide-react'
 import { useRef } from 'react'
 import SwipeableRow from '../components/UI/SwipeableRow'
+import TransactionDetail from '../components/UI/TransactionDetail'
 import './TransactionsPage.css'
 
 export default function TransactionsPage() {
@@ -18,6 +19,7 @@ export default function TransactionsPage() {
   const fileInputRef = useRef(null)
 
   const [search, setSearch] = useState('')
+  const [selectedTx, setSelectedTx] = useState(null)
   const [filterType, setFilterType] = useState('all') // all, income, expense
   const [showFilters, setShowFilters] = useState(false)
   
@@ -150,6 +152,7 @@ export default function TransactionsPage() {
   }, [transactions, categories])
 
   return (
+    <>
     <div className="page container">
       <header className="txp-header">
         <h1 className="txp-title">Transações</h1>
@@ -327,7 +330,7 @@ export default function TransactionsPage() {
                       leftLabel="Editar"
                       rightLabel="Excluir"
                     >
-                      <div className="transaction-item txp-item">
+                      <div className="transaction-item txp-item" onClick={() => setSelectedTx(tx)} style={{ cursor: 'pointer' }}>
                         <div className="tx-icon" style={{ background: cat?.color + '18', color: cat?.color }}>
                           <CategoryIcon iconName={cat?.icon} size={18} color={cat?.color} />
                         </div>
@@ -348,10 +351,10 @@ export default function TransactionsPage() {
                           <span className={`tx-amount ${tx.type}`}>
                             {tx.type === 'income' ? '+' : '-'}{formatCurrency(tx.amount, currency)}
                           </span>
-                          <button className="txp-edit" onClick={() => navigate(`/add?edit=${tx.id}`)} aria-label="Editar">
+                          <button className="txp-edit" onClick={(e) => { e.stopPropagation(); navigate(`/add?edit=${tx.id}`) }} aria-label="Editar">
                             <Pencil size={14} />
                           </button>
-                          <button className="txp-delete" onClick={() => handleDelete(tx.id)} aria-label="Deletar">
+                          <button className="txp-delete" onClick={(e) => { e.stopPropagation(); handleDelete(tx.id) }} aria-label="Deletar">
                             <Trash2 size={14} />
                           </button>
                         </div>
@@ -365,5 +368,7 @@ export default function TransactionsPage() {
         </div>
       )}
     </div>
+    <TransactionDetail transaction={selectedTx} onClose={() => setSelectedTx(null)} onDelete={(id) => { deleteTransaction(id); setSelectedTx(null) }} />
+    </>
   )
 }

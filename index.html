@@ -2,22 +2,36 @@
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover" />
     <meta name="description" content="FinFlow - Seu app de gerenciamento financeiro pessoal. Controle seus gastos e ganhos de forma simples e inteligente." />
     <meta name="theme-color" content="#6C5CE7" />
+    <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="FinFlow" />
+    <!-- Open Graph -->
+    <meta property="og:title" content="FinFlow — Gerenciamento Financeiro" />
+    <meta property="og:description" content="Controle seus gastos e ganhos de forma simples e inteligente." />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="/icon-512.png" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/icon-192.png" />
-    <link rel="manifest" href="/manifest.json" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
     <title>FinFlow — Gerenciamento Financeiro</title>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <!-- Splash screen shown while React loads -->
+      <div id="splash-loader" style="min-height:100dvh;display:flex;align-items:center;justify-content:center;background:#0F0F14;flex-direction:column;gap:16px;">
+        <div style="width:56px;height:56px;border-radius:16px;background:linear-gradient(135deg,#6C5CE7,#A29BFE);display:flex;align-items:center;justify-content:center;box-shadow:0 8px 30px rgba(108,92,231,0.35);animation:pulse 2s ease-in-out infinite;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2.5"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></svg>
+        </div>
+        <div style="font-family:'Inter',sans-serif;font-size:1.25rem;font-weight:700;background:linear-gradient(135deg,#6C5CE7,#A29BFE);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">FinFlow</div>
+        <style>@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}</style>
+      </div>
+    </div>
     <script type="module" src="/src/main.jsx"></script>
     <script>
       if ('serviceWorker' in navigator) {

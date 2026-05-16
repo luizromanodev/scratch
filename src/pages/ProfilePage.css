@@ -160,6 +160,33 @@
 
 .toggle-switch-mini.on .toggle-thumb-mini { transform: translateX(16px); }
 
+/* Accent Color Picker */
+.prof-accent-picker {
+  display: flex;
+  gap: var(--space-3);
+  padding-left: 52px;
+}
+
+.prof-accent-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-full);
+  border: 3px solid transparent;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  box-shadow: var(--shadow-sm);
+}
+
+.prof-accent-btn:hover {
+  transform: scale(1.15);
+}
+
+.prof-accent-btn.active {
+  border-color: var(--text-primary);
+  box-shadow: 0 0 0 2px var(--bg-secondary), 0 0 12px currentColor;
+  transform: scale(1.1);
+}
+
 /* Footer */
 .prof-footer {
   text-align: center;

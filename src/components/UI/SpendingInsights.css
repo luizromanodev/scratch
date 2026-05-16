@@ -1,0 +1,79 @@
+/* ═══════════════════════════════
+   Spending Insights
+   ═══════════════════════════════ */
+
+.insights-section { margin-bottom: var(--space-4); }
+
+.insights-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+
+.insights-header-icon {
+  color: var(--primary-400);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.insights-cards {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.insight-card {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  border-left: 3px solid transparent;
+  transition: all var(--transition-fast);
+}
+
+.insight-card:hover { transform: translateX(4px); }
+
+.insight-success {
+  background: rgba(0, 208, 156, 0.06);
+  border-left-color: var(--success-500);
+}
+
+.insight-warning {
+  background: rgba(253, 203, 110, 0.06);
+  border-left-color: var(--warning-500);
+}
+
+.insight-danger {
+  background: rgba(255, 107, 107, 0.06);
+  border-left-color: var(--danger-500);
+}
+
+.insight-info {
+  background: rgba(116, 185, 255, 0.06);
+  border-left-color: #74B9FF;
+}
+
+.insight-emoji {
+  font-size: 1.25rem;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.insight-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.insight-title {
+  font-size: var(--font-sm);
+  font-weight: var(--weight-semibold);
+}
+
+.insight-desc {
+  font-size: var(--font-xs);
+  color: var(--text-tertiary);
+  line-height: 1.5;
+}

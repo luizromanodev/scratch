@@ -1,27 +1,28 @@
 import { useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import { useTheme } from '../context/ThemeContext'
+import { useTheme, ACCENT_COLORS } from '../context/ThemeContext'
 import { useFinance } from '../context/FinanceContext'
 import { useToast } from '../components/UI/Toast'
 import { currencies } from '../utils/formatCurrency'
 import Modal from '../components/UI/Modal'
 import {
   User, Moon, Sun, Globe, Trash2, LogOut, ChevronRight,
-  Download, Upload, Palette, Info, Tags, Wallet, Save, FolderUp
+  Download, Upload, Palette, Info, Tags, Wallet, Save, FolderUp, Trophy, Repeat, Calendar, Bell, Sparkles
 } from 'lucide-react'
 import './ProfilePage.css'
 
 export default function ProfilePage() {
   const navigate = useNavigate()
   const { user, logout, updateUser } = useAuth()
-  const { theme, toggleTheme } = useTheme()
+  const { theme, toggleTheme, accent, setAccent } = useTheme()
   const { currency, setCurrency, transactions, clearAllData, exportData, importData } = useFinance()
   const { addToast } = useToast()
   const restoreInputRef = useRef(null)
 
   const [showCurrency, setShowCurrency] = useState(false)
   const [showClearConfirm, setShowClearConfirm] = useState(false)
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
   const [editingName, setEditingName] = useState(false)
   const [newName, setNewName] = useState(user?.name || '')
 
@@ -131,6 +132,54 @@ export default function ProfilePage() {
           </div>
         </button>
 
+        {/* Accent Color */}
+        <div className="prof-item" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: '12px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', width: '100%' }}>
+            <div className="prof-item-icon" style={{ background: 'rgba(108, 92, 231, 0.12)', color: 'var(--primary-500)' }}>
+              <Palette size={20} />
+            </div>
+            <div className="prof-item-info">
+              <span className="prof-item-label">Cor do App</span>
+              <span className="prof-item-value">{ACCENT_COLORS[accent]?.name || 'Índigo'}</span>
+            </div>
+          </div>
+          <div className="prof-accent-picker">
+            {Object.entries(ACCENT_COLORS).map(([key, color]) => (
+              <button
+                key={key}
+                className={`prof-accent-btn ${accent === key ? 'active' : ''}`}
+                style={{ background: color.primary }}
+                onClick={() => { setAccent(key); addToast(`Cor alterada para ${color.name}`, 'success') }}
+                aria-label={color.name}
+              />
+            ))}
+          </div>
+        </div>
+
+        {/* Notifications */}
+        <button className="prof-item" onClick={() => navigate('/notifications')} id="btn-notifications">
+          <div className="prof-item-icon" style={{ background: 'rgba(108, 92, 231, 0.12)', color: 'var(--primary-500)' }}>
+            <Bell size={20} />
+          </div>
+          <div className="prof-item-info">
+            <span className="prof-item-label">Notificações</span>
+            <span className="prof-item-value">Push notifications no celular</span>
+          </div>
+          <ChevronRight size={18} className="prof-item-arrow" />
+        </button>
+
+        {/* AI Assistant */}
+        <button className="prof-item" onClick={() => navigate('/ai')} id="btn-ai-assistant">
+          <div className="prof-item-icon" style={{ background: 'linear-gradient(135deg, rgba(108, 92, 231, 0.15), rgba(162, 155, 254, 0.15))', color: '#A29BFE' }}>
+            <Sparkles size={20} />
+          </div>
+          <div className="prof-item-info">
+            <span className="prof-item-label">FinBot IA</span>
+            <span className="prof-item-value">Assistente financeiro inteligente</span>
+          </div>
+          <ChevronRight size={18} className="prof-item-arrow" />
+        </button>
+
         {/* Accounts */}
         <button className="prof-item" onClick={() => navigate('/accounts')} id="btn-accounts">
           <div className="prof-item-icon" style={{ background: 'rgba(0, 208, 156, 0.12)', color: 'var(--success-500)' }}>
@@ -151,6 +200,42 @@ export default function ProfilePage() {
           <div className="prof-item-info">
             <span className="prof-item-label">Categorias</span>
             <span className="prof-item-value">Gerenciar categorias</span>
+          </div>
+          <ChevronRight size={18} className="prof-item-arrow" />
+        </button>
+
+        {/* Recurring */}
+        <button className="prof-item" onClick={() => navigate('/recurring')} id="btn-recurring">
+          <div className="prof-item-icon" style={{ background: 'rgba(116, 185, 255, 0.12)', color: '#74B9FF' }}>
+            <Repeat size={20} />
+          </div>
+          <div className="prof-item-info">
+            <span className="prof-item-label">Recorrentes</span>
+            <span className="prof-item-value">Assinaturas e contas fixas</span>
+          </div>
+          <ChevronRight size={18} className="prof-item-arrow" />
+        </button>
+
+        {/* Annual Summary */}
+        <button className="prof-item" onClick={() => navigate('/annual')} id="btn-annual">
+          <div className="prof-item-icon" style={{ background: 'rgba(253, 203, 110, 0.12)', color: '#FDCB6E' }}>
+            <Calendar size={20} />
+          </div>
+          <div className="prof-item-info">
+            <span className="prof-item-label">Resumo Anual</span>
+            <span className="prof-item-value">Visão completa do ano</span>
+          </div>
+          <ChevronRight size={18} className="prof-item-arrow" />
+        </button>
+
+        {/* Achievements */}
+        <button className="prof-item" onClick={() => navigate('/achievements')} id="btn-achievements">
+          <div className="prof-item-icon" style={{ background: 'rgba(225, 112, 85, 0.12)', color: '#E17055' }}>
+            <Trophy size={20} />
+          </div>
+          <div className="prof-item-info">
+            <span className="prof-item-label">Conquistas</span>
+            <span className="prof-item-value">Desbloqueie badges</span>
           </div>
           <ChevronRight size={18} className="prof-item-arrow" />
         </button>
@@ -225,7 +310,7 @@ export default function ProfilePage() {
           <ChevronRight size={18} className="prof-item-arrow" />
         </button>
 
-        <button className="prof-item danger" onClick={logout} id="btn-logout">
+        <button className="prof-item danger" onClick={() => setShowLogoutConfirm(true)} id="btn-logout">
           <div className="prof-item-icon" style={{ background: 'rgba(255, 107, 107, 0.12)', color: 'var(--danger-500)' }}>
             <LogOut size={20} />
           </div>
@@ -269,6 +354,17 @@ export default function ProfilePage() {
           <div className="clear-actions">
             <button className="clear-cancel" onClick={() => setShowClearConfirm(false)}>Cancelar</button>
             <button className="clear-delete" onClick={handleClear}>Apagar tudo</button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Logout Confirm Modal */}
+      <Modal isOpen={showLogoutConfirm} onClose={() => setShowLogoutConfirm(false)} title="Sair da Conta">
+        <div className="clear-confirm">
+          <p className="clear-warning">Tem certeza que deseja sair? Seus dados continuarão salvos neste dispositivo.</p>
+          <div className="clear-actions">
+            <button className="clear-cancel" onClick={() => setShowLogoutConfirm(false)}>Cancelar</button>
+            <button className="clear-delete" onClick={logout}>Sair</button>
           </div>
         </div>
       </Modal>

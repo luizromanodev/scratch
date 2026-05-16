@@ -1,0 +1,41 @@
+/* Daily Tip */
+.daily-tip {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: linear-gradient(135deg, rgba(108, 92, 231, 0.06), rgba(253, 203, 110, 0.06));
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-lg);
+  margin-bottom: var(--space-4);
+  position: relative;
+}
+
+.daily-tip-emoji {
+  font-size: 1.25rem;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.daily-tip-text {
+  font-size: var(--font-sm);
+  color: var(--text-secondary);
+  line-height: 1.5;
+  flex: 1;
+}
+
+.daily-tip-close {
+  width: 24px; height: 24px;
+  border-radius: var(--radius-full);
+  background: none; border: none;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  transition: all var(--transition-fast);
+}
+
+.daily-tip-close:hover {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}

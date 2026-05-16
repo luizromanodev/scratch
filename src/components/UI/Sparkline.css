@@ -1,0 +1,15 @@
+/* Sparkline */
+.sparkline {
+  display: block;
+  overflow: visible;
+}
+
+.sparkline polyline {
+  animation: sparkDraw 1s ease-out forwards;
+  stroke-dasharray: 500;
+  stroke-dashoffset: 500;
+}
+
+@keyframes sparkDraw {
+  to { stroke-dashoffset: 0; }
+}

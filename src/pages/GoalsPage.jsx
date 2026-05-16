@@ -5,6 +5,7 @@ import { formatCurrency } from '../utils/formatCurrency'
 import { Target, Plus, Trash2, ArrowLeft, Trophy, DollarSign } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import Modal from '../components/UI/Modal'
+import Confetti from '../components/UI/Confetti'
 import './GoalsPage.css'
 
 export default function GoalsPage() {
@@ -18,6 +19,7 @@ export default function GoalsPage() {
   
   const [formData, setFormData] = useState({ name: '', targetAmount: '', deadline: '', color: '#6C5CE7' })
   const [depositAmount, setDepositAmount] = useState('')
+  const [showConfetti, setShowConfetti] = useState(false)
 
   const colors = ['#6C5CE7', '#00B894', '#FF7675', '#0984E3', '#FDCB6E', '#E17055', '#D63031', '#2D3436']
 
@@ -69,10 +71,19 @@ export default function GoalsPage() {
     })
 
     setIsDepositModalOpen(false)
-    addToast('Valor guardado com sucesso!', 'success')
+
+    if (newAmount >= activeGoal.targetAmount) {
+      setShowConfetti(true)
+      addToast('🎉 Meta atingida! Parabéns!', 'success')
+      setTimeout(() => setShowConfetti(false), 3500)
+    } else {
+      addToast('Valor guardado com sucesso!', 'success')
+    }
   }
 
   return (
+    <>
+    <Confetti active={showConfetti} />
     <div className="page container">
       <header className="goals-header">
         <button className="back-btn" onClick={() => navigate(-1)} aria-label="Voltar">
@@ -239,5 +250,6 @@ export default function GoalsPage() {
         )}
       </Modal>
     </div>
+    </>
   )
 }
