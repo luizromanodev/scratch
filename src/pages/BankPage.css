@@ -196,48 +196,54 @@
   font-size: var(--font-sm);
   margin-bottom: var(--space-4);
 }
-
-/* Step 1: Bank Selection Grid */
+/* Step 1: Bank Selection List */
 .bank-select-grid {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
+  display: flex !important;
+  flex-direction: column !important;
+  flex-wrap: nowrap !important;
+  gap: 8px;
   max-height: 380px;
   overflow-y: auto;
+  width: 100%;
 }
 
 .bank-select-item {
-  display: flex;
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
   align-items: center;
-  gap: var(--space-3);
-  padding: var(--space-3) var(--space-4);
+  gap: 12px;
+  padding: 12px 16px;
   background: var(--bg-secondary);
   border: 1px solid var(--card-border);
-  border-radius: var(--radius-lg);
+  border-radius: 12px;
   cursor: pointer;
   transition: all 0.2s;
-  width: 100%;
+  width: 100% !important;
+  min-width: 0;
   text-align: left;
+  flex-shrink: 0;
 }
 
 .bank-select-item:hover {
   border-color: var(--primary-500);
-  background: rgba(108, 92, 231, 0.05);
+  background: rgba(108, 92, 231, 0.08);
   transform: translateX(4px);
 }
 
 [data-theme="dark"] .bank-select-item:hover {
-  background: rgba(108, 92, 231, 0.1);
+  background: rgba(108, 92, 231, 0.12);
 }
 
 .bank-select-avatar {
   width: 40px;
   height: 40px;
-  border-radius: var(--radius-md);
+  min-width: 40px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: var(--weight-bold);
+  font-weight: 700;
   font-size: 0.9rem;
   color: white;
   flex-shrink: 0;
@@ -246,15 +252,19 @@
 .bank-select-avatar.large {
   width: 56px;
   height: 56px;
+  min-width: 56px;
   font-size: 1.2rem;
-  border-radius: var(--radius-lg);
+  border-radius: 14px;
 }
 
 .bank-select-name {
   flex: 1;
-  font-weight: var(--weight-medium);
-  font-size: var(--font-base);
+  font-weight: 500;
+  font-size: 0.95rem;
   color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .bank-select-arrow {
