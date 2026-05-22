@@ -1,10 +1,14 @@
-import { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react'
+import { createContext, useContext, useState, useEffect, useCallback, useMemo, useRef } from 'react'
+import { useAuth } from './AuthContext'
 import { defaultCategories } from '../utils/categories'
 import { notifyTransaction, runNotificationChecks } from '../utils/notificationManager'
+import { isSupabaseEnabled } from '../lib/supabase'
+import { loadUserData, saveUserData } from '../lib/dataService'
 
 const FinanceContext = createContext()
 
-const STORAGE_KEY = 'finflow_data'
+const STORAGE_KEY_PREFIX = 'finflow_data_'
+const LEGACY_STORAGE_KEY = 'finflow_data'
 
 const DEFAULT_ACCOUNT = {
   id: 'main',
@@ -15,17 +19,7 @@ const DEFAULT_ACCOUNT = {
   initialBalance: 0,
 }
 
-function loadData() {
-  try {
-    const saved = localStorage.getItem(STORAGE_KEY)
-    if (saved) {
-      const parsed = JSON.parse(saved)
-      // Migration: ensure accounts/tags exist
-      if (!parsed.accounts) parsed.accounts = [DEFAULT_ACCOUNT]
-      if (!parsed.tags) parsed.tags = []
-      return parsed
-    }
-  } catch (e) { console.error('Error loading data:', e) }
+function getDefaultData() {
   return {
     transactions: [],
     categories: defaultCategories,
@@ -39,16 +33,100 @@ function loadData() {
   }
 }
 
-function saveData(data) {
+function normalizeData(parsed) {
+  if (!parsed) return null
+  if (!parsed.accounts) parsed.accounts = [DEFAULT_ACCOUNT]
+  if (!parsed.tags) parsed.tags = []
+  if (!parsed.transactions) parsed.transactions = []
+  if (!parsed.categories) parsed.categories = defaultCategories
+  if (!parsed.budgets) parsed.budgets = []
+  if (!parsed.goals) parsed.goals = []
+  if (!parsed.creditCards) parsed.creditCards = []
+  if (!parsed.banks) parsed.banks = []
+  if (!parsed.currency) parsed.currency = 'BRL'
+  return parsed
+}
+
+function loadDataLocal(userId) {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data))
+    // Try user-scoped data first
+    const userKey = STORAGE_KEY_PREFIX + userId
+    const saved = localStorage.getItem(userKey)
+    if (saved) {
+      return normalizeData(JSON.parse(saved))
+    }
+
+    // Migration: if legacy shared data exists and no user-scoped data yet, migrate it
+    const legacy = localStorage.getItem(LEGACY_STORAGE_KEY)
+    if (legacy) {
+      const parsed = normalizeData(JSON.parse(legacy))
+      // Save to user-scoped key
+      localStorage.setItem(userKey, JSON.stringify(parsed))
+      // Remove legacy key so it doesn't get re-migrated for another user
+      localStorage.removeItem(LEGACY_STORAGE_KEY)
+      return parsed
+    }
+  } catch (e) { console.error('Error loading data:', e) }
+  return getDefaultData()
+}
+
+function saveDataLocal(userId, data) {
+  try {
+    localStorage.setItem(STORAGE_KEY_PREFIX + userId, JSON.stringify(data))
   } catch (e) { console.error('Error saving data:', e) }
 }
 
 export function FinanceProvider({ children }) {
-  const [data, setData] = useState(loadData)
+  const { user } = useAuth()
+  const userId = user?.id
+  const [data, setData] = useState(() => loadDataLocal(userId))
+  const [cloudSynced, setCloudSynced] = useState(false)
+  const saveTimerRef = useRef(null)
 
-  useEffect(() => { saveData(data) }, [data])
+  // Load data on userId change (local first, then cloud)
+  useEffect(() => {
+    if (!userId) return
+
+    // Always load local data first (instant)
+    setData(loadDataLocal(userId))
+
+    // Then try to load from cloud (async)
+    if (isSupabaseEnabled()) {
+      loadUserData(userId).then(cloudData => {
+        if (cloudData) {
+          const normalized = normalizeData(cloudData)
+          setData(normalized)
+          // Also update local cache
+          saveDataLocal(userId, normalized)
+          setCloudSynced(true)
+        }
+      }).catch(() => {
+        // Cloud load failed — local data is fine
+      })
+    }
+  }, [userId])
+
+  // Save data on changes — local immediately, cloud debounced
+  useEffect(() => {
+    if (!userId) return
+    
+    // Always save locally (instant)
+    saveDataLocal(userId, data)
+    
+    // Debounce cloud save (2s)
+    if (isSupabaseEnabled()) {
+      if (saveTimerRef.current) clearTimeout(saveTimerRef.current)
+      saveTimerRef.current = setTimeout(() => {
+        saveUserData(userId, data).then(ok => {
+          if (ok) setCloudSynced(true)
+        })
+      }, 2000)
+    }
+
+    return () => {
+      if (saveTimerRef.current) clearTimeout(saveTimerRef.current)
+    }
+  }, [data, userId])
 
   // ── Transactions ──
   const addTransaction = useCallback((transaction) => {

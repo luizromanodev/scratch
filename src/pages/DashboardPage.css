@@ -17,13 +17,16 @@
 }
 
 .dash-search-btn {
-  width: 38px; height: 38px;
+  width: 38px;
+  height: 38px;
   border-radius: var(--radius-full);
   background: var(--bg-tertiary);
   border: 1px solid var(--card-border);
   color: var(--text-secondary);
   cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   transition: all var(--transition-fast);
   flex-shrink: 0;
 }
@@ -54,6 +57,7 @@
   padding: var(--space-1);
   border-radius: var(--radius-full);
   margin-bottom: var(--space-4);
+  z-index: 999;
 }
 
 .dash-month-btn {
@@ -69,7 +73,10 @@
   justify-content: center;
   transition: all var(--transition-fast);
 }
-.dash-month-btn:hover { background: var(--bg-secondary); color: var(--text-primary); }
+.dash-month-btn:hover {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
 
 .dash-month-label {
   font-size: var(--font-sm);
@@ -92,7 +99,7 @@
 }
 
 .balance-card::before {
-  content: '';
+  content: "";
   position: absolute;
   top: -50%;
   right: -30%;
@@ -103,7 +110,7 @@
 }
 
 .balance-card::after {
-  content: '';
+  content: "";
   position: absolute;
   bottom: -40%;
   left: -20%;
@@ -143,7 +150,9 @@
   justify-content: center;
   transition: background var(--transition-fast);
 }
-.balance-toggle:hover { background: rgba(255, 255, 255, 0.25); }
+.balance-toggle:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
 
 .balance-amount {
   font-size: var(--font-3xl);
@@ -159,11 +168,12 @@
   opacity: 0.5;
 }
 
-.balance-amount .positive { color: white; }
-.balance-amount .negative { color: #FFB4B4; }
-
-
-
+.balance-amount .positive {
+  color: white;
+}
+.balance-amount .negative {
+  color: #ffb4b4;
+}
 
 .balance-details {
   display: flex;
@@ -195,12 +205,12 @@
 
 .balance-detail.income .balance-detail-icon {
   background: rgba(0, 208, 156, 0.2);
-  color: #00D09C;
+  color: #00d09c;
 }
 
 .balance-detail.expense .balance-detail-icon {
   background: rgba(255, 107, 107, 0.2);
-  color: #FF6B6B;
+  color: #ff6b6b;
 }
 
 .balance-detail-label {
@@ -244,7 +254,9 @@
   transition: all var(--transition-fast);
 }
 
-.quick-btn:active { transform: scale(0.97); }
+.quick-btn:active {
+  transform: scale(0.97);
+}
 
 .quick-btn-icon {
   width: 36px;
@@ -327,9 +339,15 @@
   color: var(--warning-500);
 }
 
-[data-theme="dark"] .budgets-icon { color: var(--primary-400); }
-[data-theme="dark"] .goals-icon { color: var(--success-400); }
-[data-theme="dark"] .reports-icon { color: var(--warning-300); }
+[data-theme="dark"] .budgets-icon {
+  color: var(--primary-400);
+}
+[data-theme="dark"] .goals-icon {
+  color: var(--success-400);
+}
+[data-theme="dark"] .reports-icon {
+  color: var(--warning-300);
+}
 
 .planning-info h3 {
   font-size: var(--font-sm);
@@ -361,7 +379,9 @@
   cursor: pointer;
   transition: color var(--transition-fast);
 }
-.section-link:hover { color: var(--primary-400); }
+.section-link:hover {
+  color: var(--primary-400);
+}
 
 /* Chart */
 .chart-card {
@@ -450,7 +470,9 @@
   cursor: pointer;
 }
 
-.transaction-item:active { transform: scale(0.99); }
+.transaction-item:active {
+  transform: scale(0.99);
+}
 
 @media (hover: hover) {
   .transaction-item:hover {
@@ -495,8 +517,12 @@
   white-space: nowrap;
 }
 
-.tx-amount.income { color: var(--success-500); }
-.tx-amount.expense { color: var(--danger-500); }
+.tx-amount.income {
+  color: var(--success-500);
+}
+.tx-amount.expense {
+  color: var(--danger-500);
+}
 
 /* Empty State */
 .empty-state {
@@ -532,7 +558,10 @@
   transition: all var(--transition-fast);
 }
 
-.empty-cta:hover { background: var(--primary-600); transform: translateY(-1px); }
+.empty-cta:hover {
+  background: var(--primary-600);
+  transform: translateY(-1px);
+}
 
 /* Account Cards on Dashboard */
 .dash-accounts-scroll {
@@ -543,7 +572,9 @@
   scrollbar-width: none;
   padding-bottom: var(--space-1);
 }
-.dash-accounts-scroll::-webkit-scrollbar { display: none; }
+.dash-accounts-scroll::-webkit-scrollbar {
+  display: none;
+}
 
 .dash-account-card {
   display: flex;
@@ -594,8 +625,12 @@
   font-weight: var(--weight-bold);
 }
 
-.dash-acc-bal.positive { color: var(--success-500); }
-.dash-acc-bal.negative { color: var(--danger-500); }
+.dash-acc-bal.positive {
+  color: var(--success-500);
+}
+.dash-acc-bal.negative {
+  color: var(--danger-500);
+}
 
 /* Tag badges (reuse from TransactionsPage) */
 .tx-tags {
@@ -625,9 +660,6 @@
   z-index: 90;
   animation: fadeIn 0.2s ease-out;
 }
-
-
-
 
 .dash-widget-panel {
   position: fixed;
@@ -848,13 +880,15 @@
   height: 52px;
   border-radius: 16px;
   border: none;
-  background: linear-gradient(135deg, #6C5CE7, #A29BFE);
+  background: linear-gradient(135deg, #6c5ce7, #a29bfe);
   color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 0 4px 20px rgba(108, 92, 231, 0.4), 0 0 40px rgba(108, 92, 231, 0.15);
+  box-shadow:
+    0 4px 20px rgba(108, 92, 231, 0.4),
+    0 0 40px rgba(108, 92, 231, 0.15);
   z-index: 40;
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   animation: fabPulse 3s ease-in-out infinite;
@@ -865,6 +899,15 @@
 }
 
 @keyframes fabPulse {
-  0%, 100% { box-shadow: 0 4px 20px rgba(108, 92, 231, 0.4), 0 0 40px rgba(108, 92, 231, 0.15); }
-  50% { box-shadow: 0 4px 25px rgba(108, 92, 231, 0.5), 0 0 50px rgba(108, 92, 231, 0.25); }
+  0%,
+  100% {
+    box-shadow:
+      0 4px 20px rgba(108, 92, 231, 0.4),
+      0 0 40px rgba(108, 92, 231, 0.15);
+  }
+  50% {
+    box-shadow:
+      0 4px 25px rgba(108, 92, 231, 0.5),
+      0 0 50px rgba(108, 92, 231, 0.25);
+  }
 }

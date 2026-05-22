@@ -4,10 +4,27 @@
  */
 
 const CHAT_HISTORY_STORAGE = 'finflow_ai_chat_history'
+const USER_API_KEY_STORAGE = 'finflow_user_api_key'
 
 // ── API Key Management ──
 export function getApiKey() {
+  // User-provided key takes priority (stored in their browser)
+  const userKey = localStorage.getItem(USER_API_KEY_STORAGE)
+  if (userKey) return userKey
+  // Fall back to env var (if deployer set one)
   return import.meta.env.VITE_GEMINI_API_KEY || ''
+}
+
+export function setUserApiKey(key) {
+  if (key) {
+    localStorage.setItem(USER_API_KEY_STORAGE, key.trim())
+  } else {
+    localStorage.removeItem(USER_API_KEY_STORAGE)
+  }
+}
+
+export function getUserApiKey() {
+  return localStorage.getItem(USER_API_KEY_STORAGE) || ''
 }
 
 // ── Chat History ──

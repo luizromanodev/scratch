@@ -14,7 +14,7 @@ import {
   Repeat, Calendar, Trophy, Sparkles, Bitcoin
 } from 'lucide-react'
 import './DashboardPage.css'
-import Onboarding from '../components/UI/Onboarding'
+import Onboarding, { isOnboardingDone } from '../components/UI/Onboarding'
 import GlobalSearch from '../components/UI/GlobalSearch'
 import BudgetAlerts from '../components/UI/BudgetAlerts'
 import NotificationCenter from '../components/UI/NotificationCenter'
@@ -38,7 +38,7 @@ export default function DashboardPage() {
   const [month, setMonth] = useState(getCurrentMonth())
   const [year, setYear] = useState(getCurrentYear())
   const [showOnboarding, setShowOnboarding] = useState(
-    () => !localStorage.getItem('finflow_onboarding_done')
+    () => !isOnboardingDone(user?.id)
   )
   const [showSearch, setShowSearch] = useState(false)
   const [showWidgetSettings, setShowWidgetSettings] = useState(false)
@@ -116,7 +116,7 @@ export default function DashboardPage() {
 
   return (
     <>
-      {showOnboarding && <Onboarding onComplete={() => setShowOnboarding(false)} />}
+      {showOnboarding && <Onboarding onComplete={() => setShowOnboarding(false)} userId={user?.id} />}
       <GlobalSearch isOpen={showSearch} onClose={() => setShowSearch(false)} />
       <div className="page container">
       {/* Header */}

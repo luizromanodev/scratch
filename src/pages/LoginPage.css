@@ -250,3 +250,22 @@
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+.login-field-error {
+  color: var(--danger-500);
+  font-size: var(--font-xs);
+  margin-top: 2px;
+  animation: fadeIn 0.2s ease;
+}
+
+.login-field-hint {
+  color: var(--text-tertiary);
+  font-size: var(--font-xs);
+  margin-top: 2px;
+  line-height: 1.4;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}

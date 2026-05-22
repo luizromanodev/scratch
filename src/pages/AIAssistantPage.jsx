@@ -6,10 +6,11 @@ import { useToast } from '../components/UI/Toast'
 import {
   getChatHistory, saveChatHistory, clearChatHistory,
   buildFinancialContext, sendMessageToAI, QUICK_PROMPTS,
+  getApiKey, getUserApiKey, setUserApiKey,
 } from '../utils/aiAssistant'
 import {
   ArrowLeft, Send, Sparkles, Trash2,
-  ChevronDown, Loader2, Lightbulb,
+  ChevronDown, Loader2, Lightbulb, KeyRound,
 } from 'lucide-react'
 import './AIAssistantPage.css'
 
@@ -49,6 +50,9 @@ export default function AIAssistantPage() {
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [showScrollBtn, setShowScrollBtn] = useState(false)
+  const [hasApiKey, setHasApiKey] = useState(() => !!getApiKey())
+  const [apiKeyInput, setApiKeyInput] = useState('')
+  const [showKeySetup, setShowKeySetup] = useState(false)
 
   const messagesEndRef = useRef(null)
   const inputRef = useRef(null)
@@ -124,7 +128,12 @@ export default function AIAssistantPage() {
       setMessages(prev => [...prev, aiMsg])
     } catch (error) {
       let errorMsg = 'Desculpe, ocorreu um erro. Tente novamente.'
-      if (error.message === 'RATE_LIMIT') {
+      if (error.message === 'API_KEY_MISSING') {
+        errorMsg = '🔑 Nenhuma chave de API configurada. Vá em **Configurar API Key** para adicionar sua chave do Google Gemini.'
+        setHasApiKey(false)
+      } else if (error.message === 'API_KEY_INVALID') {
+        errorMsg = '🔑 Chave de API inválida. Verifique sua chave nas configurações.'
+      } else if (error.message === 'RATE_LIMIT') {
         errorMsg = 'Limite de requisições atingido. Aguarde um momento e tente novamente.'
       }
 
@@ -174,7 +183,64 @@ export default function AIAssistantPage() {
             <Trash2 size={16} />
           </button>
         )}
+        <button
+          className="ai-clear-btn"
+          onClick={() => setShowKeySetup(!showKeySetup)}
+          aria-label="Configurar API Key"
+          title="Configurar API Key"
+          style={!hasApiKey ? { color: 'var(--warning-500)' } : {}}
+        >
+          <KeyRound size={16} />
+        </button>
       </header>
+
+      {/* API Key Setup Panel */}
+      {showKeySetup && (
+        <div className="ai-key-setup">
+          <p className="ai-key-setup-title">🔑 Chave da API Gemini</p>
+          <p className="ai-key-setup-desc">
+            O FinBot usa a API do Google Gemini. Crie sua chave grátis em{' '}
+            <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer">
+              Google AI Studio
+            </a>
+          </p>
+          <div className="ai-key-setup-form">
+            <input
+              type="password"
+              placeholder="Cole sua API key aqui..."
+              value={apiKeyInput}
+              onChange={e => setApiKeyInput(e.target.value)}
+              className="ai-key-input"
+            />
+            <button
+              className="ai-key-save-btn"
+              disabled={!apiKeyInput.trim()}
+              onClick={() => {
+                setUserApiKey(apiKeyInput.trim())
+                setHasApiKey(true)
+                setShowKeySetup(false)
+                setApiKeyInput('')
+                addToast('API Key salva com sucesso!', 'success')
+              }}
+            >
+              Salvar
+            </button>
+          </div>
+          {getUserApiKey() && (
+            <button
+              className="ai-key-remove-btn"
+              onClick={() => {
+                setUserApiKey(null)
+                setHasApiKey(!!import.meta.env.VITE_GEMINI_API_KEY)
+                setApiKeyInput('')
+                addToast('API Key removida', 'info')
+              }}
+            >
+              Remover chave salva
+            </button>
+          )}
+        </div>
+      )}
 
       {/* Chat Area */}
       <div className="ai-chat-area" ref={chatContainerRef}>

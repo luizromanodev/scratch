@@ -8,16 +8,39 @@ export default function LoginPage() {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [step, setStep] = useState(0) // 0=splash, 1=form
-  const [nameError, setNameError] = useState(false)
+  const [errors, setErrors] = useState({})
+
+  const validateForm = () => {
+    const newErrors = {}
+    const trimmedName = name.trim()
+
+    if (!trimmedName) {
+      newErrors.name = 'Por favor, digite seu nome'
+    } else if (trimmedName.length < 2) {
+      newErrors.name = 'O nome deve ter pelo menos 2 caracteres'
+    } else if (trimmedName.length > 50) {
+      newErrors.name = 'O nome deve ter no máximo 50 caracteres'
+    }
+
+    const trimmedEmail = email.trim()
+    if (trimmedEmail) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+      if (!emailRegex.test(trimmedEmail)) {
+        newErrors.email = 'Digite um e-mail válido'
+      }
+    }
+
+    setErrors(newErrors)
+    return Object.keys(newErrors).length === 0
+  }
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    if (!name.trim()) {
-      setNameError(true)
-      return
-    }
+    if (!validateForm()) return
     login(name.trim(), email.trim())
   }
+
+  const isFormValid = name.trim().length >= 2
 
   if (step === 0) {
     return (
@@ -73,20 +96,20 @@ export default function LoginPage() {
           <h2>Crie sua conta</h2>
           <p>Preencha seus dados para começar</p>
         </div>
-        <form onSubmit={handleSubmit} className="login-form">
+        <form onSubmit={handleSubmit} className="login-form" noValidate>
           <div className="form-group">
-            <label htmlFor="login-name">Seu nome</label>
+            <label htmlFor="login-name">Seu nome *</label>
             <input
               id="login-name"
               type="text"
               placeholder="Como podemos te chamar?"
               value={name}
-              onChange={e => { setName(e.target.value); setNameError(false) }}
+              onChange={e => { setName(e.target.value); setErrors(prev => ({ ...prev, name: undefined })) }}
               autoFocus
-              required
-              style={nameError ? { borderColor: 'var(--danger-500)', boxShadow: '0 0 0 3px rgba(255,107,107,0.15)' } : {}}
+              maxLength={50}
+              style={errors.name ? { borderColor: 'var(--danger-500)', boxShadow: '0 0 0 3px rgba(255,107,107,0.15)' } : {}}
             />
-            {nameError && <span style={{ color: 'var(--danger-500)', fontSize: 'var(--font-xs)', marginTop: '4px' }}>Por favor, digite seu nome</span>}
+            {errors.name && <span className="login-field-error">{errors.name}</span>}
           </div>
           <div className="form-group">
             <label htmlFor="login-email">E-mail (opcional)</label>
@@ -95,10 +118,13 @@ export default function LoginPage() {
               type="email"
               placeholder="seu@email.com"
               value={email}
-              onChange={e => setEmail(e.target.value)}
+              onChange={e => { setEmail(e.target.value); setErrors(prev => ({ ...prev, email: undefined })) }}
+              style={errors.email ? { borderColor: 'var(--danger-500)', boxShadow: '0 0 0 3px rgba(255,107,107,0.15)' } : {}}
             />
+            {errors.email && <span className="login-field-error">{errors.email}</span>}
+            <span className="login-field-hint">Usar o mesmo e-mail restaura seus dados em qualquer dispositivo</span>
           </div>
-          <button type="submit" className="login-submit" disabled={!name.trim()} id="btn-login">
+          <button type="submit" className="login-submit" disabled={!isFormValid} id="btn-login">
             <span>Entrar no FinFlow</span>
             <ArrowRight size={20} />
           </button>

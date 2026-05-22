@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Wallet, ArrowRight, BarChart3, PieChart, Target } from 'lucide-react'
+import { Wallet, ArrowRight, BarChart3, PieChart, Target, Sparkles } from 'lucide-react'
 import './Onboarding.css'
 
 const slides = [
@@ -13,7 +13,7 @@ const slides = [
   {
     emoji: '📝',
     title: 'Registre seus gastos',
-    description: 'Adicione receitas e despesas com categorias, datas e até parcelamento.',
+    description: 'Adicione receitas e despesas com categorias, datas e até parcelamento. Use o botão + na barra inferior.',
     icon: BarChart3,
     color: '#00D09C',
   },
@@ -31,26 +31,41 @@ const slides = [
     icon: Target,
     color: '#FDCB6E',
   },
+  {
+    emoji: '✨',
+    title: 'FinBot — Seu assistente IA',
+    description: 'Peça análises, relatórios e dicas personalizadas sobre suas finanças. Acesse pelo Dashboard.',
+    icon: Sparkles,
+    color: '#A29BFE',
+  },
 ]
 
-export default function Onboarding({ onComplete }) {
+// Onboarding key is scoped per user to ensure every new user sees the tour
+function getOnboardingKey(userId) {
+  return `finflow_onboarding_done_${userId || 'guest'}`
+}
+
+export function isOnboardingDone(userId) {
+  return localStorage.getItem(getOnboardingKey(userId)) === 'true'
+}
+
+export default function Onboarding({ onComplete, userId }) {
   const [current, setCurrent] = useState(0)
 
   const isLast = current === slides.length - 1
   const slide = slides[current]
 
+  const markDone = () => {
+    localStorage.setItem(getOnboardingKey(userId), 'true')
+    onComplete()
+  }
+
   const handleNext = () => {
     if (isLast) {
-      localStorage.setItem('finflow_onboarding_done', 'true')
-      onComplete()
+      markDone()
     } else {
       setCurrent(c => c + 1)
     }
-  }
-
-  const handleSkip = () => {
-    localStorage.setItem('finflow_onboarding_done', 'true')
-    onComplete()
   }
 
   return (
@@ -60,7 +75,7 @@ export default function Onboarding({ onComplete }) {
         <div className="onb-circle onb-circle-2" style={{ background: slide.color + '10' }} />
       </div>
 
-      <button className="onb-skip" onClick={handleSkip}>
+      <button className="onb-skip" onClick={markDone}>
         Pular
       </button>
 

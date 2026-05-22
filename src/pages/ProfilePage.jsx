@@ -323,7 +323,7 @@ export default function ProfilePage() {
 
       {/* App Info */}
       <div className="prof-footer">
-        <p>FinFlow v2.0.0</p>
+        <p>FinFlow v{__APP_VERSION__}</p>
         <p>Feito com 💜</p>
       </div>
 
