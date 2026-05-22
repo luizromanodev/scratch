@@ -105,7 +105,8 @@
   font-size: var(--font-base);
 }
 
-.bank-type, .bank-balance {
+.bank-type,
+.bank-balance {
   display: block;
   font-size: var(--font-sm);
   color: var(--text-secondary);
@@ -121,7 +122,8 @@
   gap: var(--space-2);
 }
 
-.bank-sync-btn, .bank-unlink-btn {
+.bank-sync-btn,
+.bank-unlink-btn {
   background: var(--bg-tertiary);
   border: none;
   cursor: pointer;
@@ -135,36 +137,336 @@
   transition: all var(--transition-fast);
 }
 
-.bank-sync-btn:hover { background: var(--primary-50); color: var(--primary-500); }
-.bank-unlink-btn:hover { background: var(--danger-50); color: var(--danger-500); }
+.bank-sync-btn:hover {
+  background: var(--primary-50);
+  color: var(--primary-500);
+}
+.bank-unlink-btn:hover {
+  background: var(--danger-50);
+  color: var(--danger-500);
+}
 
-[data-theme="dark"] .bank-sync-btn:hover { background: rgba(108, 92, 231, 0.15); }
-[data-theme="dark"] .bank-unlink-btn:hover { background: rgba(255, 107, 107, 0.15); }
+[data-theme="dark"] .bank-sync-btn:hover {
+  background: rgba(108, 92, 231, 0.15);
+}
+[data-theme="dark"] .bank-unlink-btn:hover {
+  background: rgba(255, 107, 107, 0.15);
+}
 
 .spinning {
   animation: spin 1s linear infinite;
 }
 
-.bank-connect-btn {
-  display: inline-flex;
+/* ── Add Bank Button ── */
+.bank-add-btn {
+  display: flex;
   align-items: center;
-  gap: var(--space-1);
-  padding: var(--space-2) var(--space-3);
+  justify-content: center;
+  gap: var(--space-2);
+  width: 100%;
+  padding: var(--space-4);
+  background: var(--card-bg);
+  border: 2px dashed var(--card-border);
+  border-radius: var(--radius-lg);
+  color: var(--primary-500);
+  font-size: var(--font-base);
+  font-weight: var(--weight-semibold);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  margin-bottom: var(--space-5);
+}
+
+.bank-add-btn:hover {
+  border-color: var(--primary-500);
+  background: rgba(108, 92, 231, 0.05);
+  transform: translateY(-1px);
+}
+
+[data-theme="dark"] .bank-add-btn:hover {
+  background: rgba(108, 92, 231, 0.1);
+}
+
+/* ── Connect Flow Modal ── */
+.connect-flow {
+  padding: var(--space-2) 0;
+}
+
+.connect-desc {
+  color: var(--text-secondary);
+  font-size: var(--font-sm);
+  margin-bottom: var(--space-4);
+}
+
+/* Step 1: Bank Selection Grid */
+.bank-select-grid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  max-height: 380px;
+  overflow-y: auto;
+}
+
+.bank-select-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: var(--bg-secondary);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all 0.2s;
+  width: 100%;
+  text-align: left;
+}
+
+.bank-select-item:hover {
+  border-color: var(--primary-500);
+  background: rgba(108, 92, 231, 0.05);
+  transform: translateX(4px);
+}
+
+[data-theme="dark"] .bank-select-item:hover {
+  background: rgba(108, 92, 231, 0.1);
+}
+
+.bank-select-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: var(--weight-bold);
+  font-size: 0.9rem;
+  color: white;
+  flex-shrink: 0;
+}
+
+.bank-select-avatar.large {
+  width: 56px;
+  height: 56px;
+  font-size: 1.2rem;
+  border-radius: var(--radius-lg);
+}
+
+.bank-select-name {
+  flex: 1;
+  font-weight: var(--weight-medium);
+  font-size: var(--font-base);
+  color: var(--text-primary);
+}
+
+.bank-select-arrow {
+  color: var(--text-tertiary);
+  flex-shrink: 0;
+}
+
+.connect-empty {
+  text-align: center;
+  padding: var(--space-6);
+  color: var(--text-secondary);
+}
+
+/* Step 2: Balance Input */
+.connect-step-2 {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.connect-bank-preview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4) 0;
+}
+
+.connect-bank-name {
+  font-size: var(--font-lg);
+  font-weight: var(--weight-bold);
+}
+
+.connect-balance-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.connect-label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--text-primary);
+}
+
+.connect-input-wrapper {
+  display: flex;
+  align-items: center;
+  background: var(--bg-secondary);
+  border: 2px solid var(--card-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+
+.connect-input-wrapper:focus-within {
+  border-color: var(--primary-500);
+}
+
+.connect-currency {
+  padding: var(--space-3) var(--space-4);
+  font-weight: var(--weight-bold);
+  font-size: var(--font-lg);
+  color: var(--text-secondary);
+  background: var(--bg-tertiary);
+  border-right: 1px solid var(--card-border);
+}
+
+.connect-balance-input {
+  flex: 1;
+  padding: var(--space-3) var(--space-4);
+  border: none;
+  background: transparent;
+  font-size: var(--font-xl);
+  font-weight: var(--weight-bold);
+  color: var(--text-primary);
+  outline: none;
+  min-width: 0;
+}
+
+.connect-balance-input::placeholder {
+  color: var(--text-tertiary);
+}
+
+.connect-hint {
+  font-size: var(--font-xs);
+  color: var(--text-tertiary);
+  line-height: 1.5;
+}
+
+.connect-actions {
+  display: flex;
+  gap: var(--space-3);
+  padding-top: var(--space-2);
+}
+
+.connect-back {
+  flex: 1;
+  padding: var(--space-3);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-lg);
+  background: transparent;
+  color: var(--text-secondary);
+  font-weight: var(--weight-medium);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.connect-back:hover {
+  border-color: var(--text-secondary);
+  color: var(--text-primary);
+}
+
+.connect-confirm {
+  flex: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  background: linear-gradient(135deg, var(--primary-500), var(--primary-700));
+  color: white;
+  border: none;
+  border-radius: var(--radius-lg);
+  font-weight: var(--weight-semibold);
+  font-size: var(--font-base);
+  cursor: pointer;
+  transition: all 0.25s;
+  box-shadow: 0 4px 16px rgba(108, 92, 231, 0.3);
+}
+
+.connect-confirm:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 24px rgba(108, 92, 231, 0.45);
+}
+
+.connect-confirm:disabled {
+  opacity: 0.7;
+  cursor: wait;
+}
+
+.connect-loading {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* Step 3: Success */
+.connect-step-3 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: var(--space-5) 0;
+  gap: var(--space-4);
+}
+
+.connect-success-icon {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: var(--success-500);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: scaleIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes scaleIn {
+  from { transform: scale(0); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.connect-success-title {
+  font-size: var(--font-xl);
+  font-weight: var(--weight-bold);
+}
+
+.connect-success-desc {
+  font-size: var(--font-sm);
+  color: var(--text-secondary);
+  line-height: 1.6;
+  max-width: 320px;
+}
+
+.connect-done {
+  width: 100%;
+  padding: var(--space-3) var(--space-5);
   background: var(--primary-500);
   color: white;
   border: none;
-  border-radius: var(--radius-full);
-  font-size: var(--font-sm);
-  font-weight: var(--weight-medium);
+  border-radius: var(--radius-lg);
+  font-weight: var(--weight-semibold);
+  font-size: var(--font-base);
   cursor: pointer;
-  transition: all var(--transition-fast);
-  white-space: nowrap;
+  transition: all 0.2s;
+  margin-top: var(--space-2);
 }
 
-.bank-connect-btn:hover:not(:disabled) { background: var(--primary-600); transform: translateY(-1px); }
-.bank-connect-btn:disabled { opacity: 0.7; cursor: wait; }
+.connect-done:hover {
+  background: var(--primary-600);
+  transform: translateY(-1px);
+}
 
-/* Info Card */
+/* ── Info Card ── */
 .bank-info-card {
   background: linear-gradient(135deg, var(--primary-600), var(--primary-800));
   border-radius: var(--radius-xl);

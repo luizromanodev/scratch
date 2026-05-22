@@ -293,7 +293,7 @@ export function FinanceProvider({ children }) {
   const addAccount = useCallback((account) => {
     setData(prev => ({
       ...prev,
-      accounts: [...(prev.accounts || []), { ...account, id: crypto.randomUUID() }]
+      accounts: [...(prev.accounts || []), { ...account, id: account.id || crypto.randomUUID() }]
     }))
   }, [])
 
